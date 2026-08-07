@@ -1,0 +1,15 @@
+# Code owners — revisão obrigatória por PR (ver ADR-0004).
+# Substitua os placeholders pelos usuários/handle reais do GitHub após criar o repositório.
+# Sintaxe: <padrão>  <@usuario ou @org/time>
+
+# Donos padrão de todo o repositório
+*                    @OWNER
+
+# Backend
+/backend/            @OWNER
+
+# Frontend
+/frontend/           @OWNER
+
+# Decisões e documentação de arquitetura
+/docs/adr/           @OWNER
