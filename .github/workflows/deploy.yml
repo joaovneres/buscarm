@@ -1,0 +1,43 @@
+name: Deploy
+
+# Deploy MANUAL de uma versão já construída (ADR-0005). Escolha a versão (tag) e o alvo.
+# O environment "producao" permite exigir aprovação antes de publicar (Settings > Environments).
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Versão a implantar (ex.: v0.1.0)'
+        required: true
+      target:
+        description: 'O que implantar'
+        type: choice
+        options: [backend, frontend, ambos]
+        default: ambos
+
+jobs:
+  deploy-backend:
+    name: deploy-backend
+    if: ${{ inputs.target == 'backend' || inputs.target == 'ambos' }}
+    runs-on: ubuntu-latest
+    environment: producao
+    steps:
+      - name: Disparar deploy no Render (imagem versionada do GHCR)
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          IMG: ghcr.io/${{ github.repository_owner }}/buscarm-backend:${{ inputs.version }}
+        run: |
+          if [ -z "$HOOK" ]; then echo "Defina o secret RENDER_DEPLOY_HOOK_URL"; exit 1; fi
+          curl -fsSL -X POST "${HOOK}&imgURL=${IMG}"
+
+  deploy-frontend:
+    name: deploy-frontend
+    if: ${{ inputs.target == 'frontend' || inputs.target == 'ambos' }}
+    runs-on: ubuntu-latest
+    environment: producao
+    steps:
+      - name: Disparar deploy no Vercel
+        env:
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK" ]; then echo "Defina o secret VERCEL_DEPLOY_HOOK_URL"; exit 1; fi
+          curl -fsSL -X POST "$HOOK"
