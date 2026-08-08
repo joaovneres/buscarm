@@ -116,43 +116,50 @@ com.buscarm
 
 ---
 
-## 3. Frontend (Next.js + React + TypeScript)
+## 3. Frontend (Next.js + React + TypeScript) — Feature-Sliced Design
 
-### 3.1 Estrutura (App Router, feature-first)
+Padrão adotado: **modular por camadas orientado a features (Feature-Sliced)**, **não Microfrontend**
+(ver [ADR-0008](./adr/0008-frontend-feature-sliced.md)). Camadas com direção de dependência única:
+`app → features → entities → shared`.
+
+### 3.1 Estrutura (App Router + Feature-Sliced)
 
 ```
 frontend/
-├── app/                      # rotas (App Router)
-│   ├── (auth)/login/
-│   ├── registros/            # pesquisa, cadastro, edição
-│   ├── importacao/
-│   │   ├── planilha/
-│   │   └── imagem/
-│   └── layout.tsx
-├── features/                 # lógica por domínio (não em app/)
-│   ├── registros/  { components, hooks, api, types }
-│   └── importacao/ { components, hooks, api, types }
-├── components/ui/            # componentes de UI reutilizáveis, acessíveis
-├── lib/                      # api client (fetch), auth, format, utils
-├── styles/
-└── tests/                    # unit (Vitest) + e2e (Playwright)
+├── app/                          # rotas (App Router) — composição das telas
+│   ├── registros/  page.tsx
+│   └── layout.tsx  page.tsx  globals.css
+├── features/                     # casos de uso interativos
+│   └── busca-registros/
+│       ├── ui/       # BuscaRegistros, TabelaResultados
+│       └── model/    # useBuscaRegistros (hook)
+├── entities/                     # modelos de domínio do front
+│   └── registro/
+│       ├── model/    # types (espelham DTOs)
+│       └── api/      # buscarRegistros (acesso a dados)
+├── shared/                       # infra reutilizável
+│   └── api/client.ts # único ponto de fetch (trata ApiError, injeta JWT)
+└── tests/                        # unit (Vitest) + e2e (Playwright)
 ```
+
+Regra de ouro: a camada de cima só importa das de baixo; uma feature **não** importa outra feature.
+Importação (Excel/foto) entra como novas `features/` reusando `entities/registro` e `shared/api`.
 
 ### 3.2 Padrões de design aplicados
 
 | Padrão | Onde | Por quê |
 | --- | --- | --- |
-| **Feature-based modules** | `features/` | coesão por domínio, escala melhor que por tipo |
-| **Container/Presentational** | components de dados × de UI | separa fetch/estado de renderização |
-| **Custom hooks** | `useRegistros`, `useImportacaoPlanilha` | encapsula chamada à API + estado |
-| **API client centralizado** | `lib/api.ts` | único ponto de `fetch`, injeta JWT, trata erro |
-| **Server vs Client Components** | App Router | render no servidor por padrão; `"use client"` só quando há interação/estado |
-| **Tipos compartilhados** | `features/*/types.ts` | espelham os DTOs do backend |
+| **Feature-Sliced (app/features/entities/shared)** | todo o front | coesão por domínio + limites de dependência explícitos |
+| **Container/Presentational** | `ui/` (dados × apresentação) | separa fetch/estado de renderização |
+| **Custom hooks** | `features/*/model` (`useBuscaRegistros`) | encapsula chamada à API + estado |
+| **API client centralizado** | `shared/api/client.ts` | único ponto de `fetch`, injeta JWT, trata erro |
+| **Server vs Client Components** | App Router | server por padrão; `"use client"` só com interação/estado |
+| **Tipos por entidade** | `entities/*/model/types.ts` | espelham os DTOs do backend |
 
 ### 3.3 Dados e estado
 
 - **Data fetching:** Server Components para leitura quando possível; para fluxos interativos
-  (upload, preview, edição) usar Client Components + hook chamando `lib/api`.
+  (upload, preview, edição) usar Client Components + hook (`features/*/model`) sobre `shared/api/client`.
 - **Estado:** local (`useState`/`useReducer`) por padrão; contexto só para auth/sessão. Evitar
   biblioteca de estado global sem necessidade.
 - **Erros e loading:** todo fluxo de importação tem estados explícitos (idle/loading/sucesso/erro).
@@ -165,7 +172,7 @@ frontend/
 
 ### 3.5 Estilo e componentes
 
-- Componentes de UI pequenos, reutilizáveis e acessíveis em `components/ui/`.
+- Componentes de UI pequenos, reutilizáveis e acessíveis em `shared/ui/`.
 - CSS Modules ou solução única definida no início — manter consistência (uma abordagem só).
 
 ---

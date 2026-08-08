@@ -1,0 +1,66 @@
+:root {
+  --cor-texto: #1a1a1a;
+  --cor-fundo: #ffffff;
+  --cor-destaque: #0b5cad;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: var(--cor-texto);
+  background: var(--cor-fundo);
+  line-height: 1.5;
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+form fieldset {
+  border: 1px solid #ccc;
+  margin: 0 0 1rem;
+}
+
+label {
+  display: inline-block;
+  margin-right: 1rem;
+}
+
+input[type='text'],
+input#termo {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  margin: 0.25rem 0 1rem;
+  font-size: 1rem;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.5rem;
+  border-bottom: 1px solid #ddd;
+}
+
+:focus-visible {
+  outline: 3px solid var(--cor-destaque);
+  outline-offset: 2px;
+}

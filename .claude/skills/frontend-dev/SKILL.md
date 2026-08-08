@@ -8,26 +8,27 @@ description: Padrões de desenvolvimento do frontend BuscaRM (Next.js + React + 
 Referências: [`docs/arquitetura.md`](../../../docs/arquitetura.md) (seção 3) e os ADRs.
 Siga também a skill `git-workflow` para commits/PR.
 
-## Estrutura (App Router, feature-first)
+## Estrutura (Feature-Sliced — ADR-0008)
+
+Direção de dependência única: `app → features → entities → shared`. Uma feature **não** importa outra.
 
 ```
-app/            # rotas: (auth)/login, registros, importacao/planilha, importacao/imagem
-features/       # lógica por domínio: { components, hooks, api, types } (NÃO dentro de app/)
-components/ui/  # UI reutilizável e acessível
-lib/            # api client, auth, format, utils
+app/            # rotas (App Router) — composição fina das telas
+features/       # casos de uso interativos: <feature>/ui + <feature>/model (hooks)
+entities/       # domínio do front: <entidade>/model (types) + <entidade>/api (acesso a dados)
+shared/         # infra reutilizável: api/client, ui, config
 tests/          # Vitest + Playwright
 ```
 
-Regra: rotas ficam finas em `app/`; a lógica de domínio mora em `features/`.
-
 ## Regras de código
 
-- **TypeScript estrito.** Sem `any`; tipos dos dados espelham os DTOs do backend em `features/*/types.ts`.
+- **TypeScript estrito.** Sem `any`; tipos dos dados espelham os DTOs do backend em `entities/*/model/types.ts`.
 - **Server Components por padrão**; use `"use client"` só quando há estado/interação (upload, preview, edição).
-- **Custom hooks** (`useRegistros`, `useImportacaoPlanilha`) encapsulam chamada à API + estado.
-  Componentes não fazem `fetch` direto.
-- **API client centralizado** em `lib/api.ts`: único ponto de `fetch`, injeta o JWT
-  (`Authorization: Bearer`), trata erro no formato `ApiError` do backend. Nunca chamar `fetch` solto.
+- **Custom hooks** em `features/*/model` (`useBuscaRegistros`) encapsulam chamada à API + estado.
+  Componentes (`features/*/ui`) não fazem `fetch` direto.
+- **Acesso a dados** da entidade em `entities/*/api`, sobre o **API client centralizado**
+  `shared/api/client.ts`: único ponto de `fetch`, injeta o JWT (`Authorization: Bearer`), trata erro
+  no formato `ApiError`. Nunca chamar `fetch` solto nem importar entre features.
 - **Container/Presentational**: separe componente que busca dados do que só renderiza.
 - **Estado**: `useState`/`useReducer` local por padrão; Context só para auth/sessão. Sem lib de estado global sem necessidade.
 - **Estados explícitos** em todo fluxo assíncrono: idle / loading / sucesso / erro (principalmente importação).
@@ -56,8 +57,8 @@ Regra: rotas ficam finas em `app/`; a lógica de domínio mora em `features/`.
 
 ## Checklist de PR (frontend)
 
-- [ ] Lógica em `features/`/hooks; rota fina em `app/`
-- [ ] Chamadas via `lib/api` (JWT + erro tratado)
+- [ ] Camadas respeitadas (`app → features → entities → shared`); sem import entre features
+- [ ] Chamadas via `shared/api/client` a partir de `entities/*/api` (JWT + erro tratado)
 - [ ] Estados idle/loading/sucesso/erro cobertos
 - [ ] Acessibilidade: semântica, foco, labels; axe/Lighthouse sem violação crítica
 - [ ] Tipos TS alinhados aos DTOs do backend

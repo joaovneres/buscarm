@@ -24,6 +24,7 @@ frontend/out/
 frontend/dist/
 frontend/coverage/
 *.tsbuildinfo
+next-env.d.ts
 .vercel/
 playwright-report/
 test-results/
