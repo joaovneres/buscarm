@@ -22,6 +22,11 @@ export function AuthNav() {
   return (
     <p>
       {usuario.nome} ({usuario.papel}){' '}
+      {usuario.papel === 'ADMIN' && (
+        <>
+          <Link href="/auditoria">Auditoria</Link>{' '}
+        </>
+      )}
       <button type="button" onClick={onSair}>
         Sair
       </button>

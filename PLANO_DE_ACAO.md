@@ -128,9 +128,9 @@ Marque `[x]` ao concluir. Divisão de responsáveis será definida mais adiante.
 - [ ] **T8.4** Estados acessíveis nas telas de importação
 
 ## Épico 9 — Auditoria e rastreabilidade
-- [ ] **T9.1** Registrar toda ação sensível (criar/alterar/desativar/importar) na `auditoria`
-- [ ] **T9.2** Endpoint/tela de consulta de auditoria (admin)
-- [ ] **T9.3** Rastrear de onde cada registro importado veio (via `importacao_item`)
+- [x] **T9.1** Registrar ações sensíveis (CRIAR/IMPORTAR/EXPORTAR) na `auditoria` (Flyway V5) pelo usuário da sessão
+- [x] **T9.2** Endpoint/tela de consulta de auditoria (admin) — `GET /api/auditoria` + página `/auditoria`
+- [x] **T9.3** Rastrear de onde cada registro importado veio (via `importacao_item`) — feito no Épico 5
 
 ## Épico 10 — Testes
 - [ ] **T10.1** Unit backend (JUnit 5 + Mockito): validador, leitor Excel, normalização

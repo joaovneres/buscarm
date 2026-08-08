@@ -5,11 +5,12 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.buscarm.auditoria.application.port.in.RegistrarAuditoriaUseCase;
 import com.buscarm.registro.application.port.in.BuscarRegistrosUseCase;
 import com.buscarm.registro.application.port.in.CadastrarRegistroUseCase;
 import com.buscarm.registro.application.port.out.RegistroRepositoryPort;
-import com.buscarm.registro.application.port.out.UsuarioAtualPort;
 import com.buscarm.registro.application.port.out.UsuarioSessaoPort;
+import com.buscarm.shared.UsuarioAtualPort;
 import com.buscarm.registro.domain.Registro;
 import com.buscarm.registro.domain.NomeNormalizer;
 import com.buscarm.registro.domain.exception.RegistroDuplicadoException;
@@ -26,13 +27,16 @@ public class RegistroApplicationService implements CadastrarRegistroUseCase, Bus
     private final RegistroRepositoryPort repositorio;
     private final UsuarioAtualPort usuarioAtual;
     private final UsuarioSessaoPort usuarioSessao;
+    private final RegistrarAuditoriaUseCase registrarAuditoria;
 
     public RegistroApplicationService(RegistroRepositoryPort repositorio,
                                       UsuarioAtualPort usuarioAtual,
-                                      UsuarioSessaoPort usuarioSessao) {
+                                      UsuarioSessaoPort usuarioSessao,
+                                      RegistrarAuditoriaUseCase registrarAuditoria) {
         this.repositorio = repositorio;
         this.usuarioAtual = usuarioAtual;
         this.usuarioSessao = usuarioSessao;
+        this.registrarAuditoria = registrarAuditoria;
     }
 
     @Override
@@ -42,8 +46,10 @@ public class RegistroApplicationService implements CadastrarRegistroUseCase, Bus
         if (repositorio.existePorRm(comando.rm())) {
             throw new RegistroDuplicadoException(comando.rm());
         }
-        Registro novo = Registro.novo(comando.rm(), comando.nomeCompleto(), comando.anoRegistro());
-        return repositorio.salvar(novo);
+        Registro salvo = repositorio.salvar(
+                Registro.novo(comando.rm(), comando.nomeCompleto(), comando.anoRegistro()));
+        registrarAuditoria.registrar("CRIAR", "REGISTRO", salvo.getId(), "RM " + salvo.getRm());
+        return salvo;
     }
 
     @Override

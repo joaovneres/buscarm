@@ -11,6 +11,7 @@ import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.buscarm.auditoria.application.port.in.RegistrarAuditoriaUseCase;
 import com.buscarm.importacao.application.port.in.ConfirmarImportacaoUseCase;
 import com.buscarm.importacao.application.port.in.ConsultarImportacaoUseCase;
 import com.buscarm.importacao.application.port.in.ValidarPlanilhaUseCase;
@@ -19,6 +20,7 @@ import com.buscarm.importacao.application.port.out.LeitorPlanilhaPort;
 import com.buscarm.importacao.domain.Importacao;
 import com.buscarm.importacao.domain.ItemImportacao;
 import com.buscarm.importacao.domain.RegistroExtraido;
+import com.buscarm.importacao.domain.StatusItem;
 import com.buscarm.importacao.domain.TipoImportacao;
 import com.buscarm.importacao.domain.ValidadorRegistro;
 import com.buscarm.importacao.domain.exception.ImportacaoNaoEncontradaException;
@@ -42,15 +44,18 @@ public class ImportacaoApplicationService
     private final ImportacaoRepositoryPort repositorio;
     private final BuscarRegistrosUseCase buscarRegistros;
     private final CadastrarRegistroUseCase cadastrarRegistro;
+    private final RegistrarAuditoriaUseCase registrarAuditoria;
 
     public ImportacaoApplicationService(LeitorPlanilhaPort leitor,
                                         ImportacaoRepositoryPort repositorio,
                                         BuscarRegistrosUseCase buscarRegistros,
-                                        CadastrarRegistroUseCase cadastrarRegistro) {
+                                        CadastrarRegistroUseCase cadastrarRegistro,
+                                        RegistrarAuditoriaUseCase registrarAuditoria) {
         this.leitor = leitor;
         this.repositorio = repositorio;
         this.buscarRegistros = buscarRegistros;
         this.cadastrarRegistro = cadastrarRegistro;
+        this.registrarAuditoria = registrarAuditoria;
     }
 
     @Override
@@ -103,7 +108,10 @@ public class ImportacaoApplicationService
         }
 
         importacao.confirmar();
-        return repositorio.salvar(importacao);
+        Importacao salva = repositorio.salvar(importacao);
+        registrarAuditoria.registrar("IMPORTAR", "IMPORTACAO", salva.getId(),
+                salva.contar(StatusItem.IMPORTADO) + " importados");
+        return salva;
     }
 
     @Override
