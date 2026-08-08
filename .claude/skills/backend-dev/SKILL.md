@@ -8,25 +8,40 @@ description: Padrões de desenvolvimento do backend BuscaRM (Java + Spring Boot)
 Referências: [`docs/arquitetura.md`](../../../docs/arquitetura.md) (seção 2) e os ADRs.
 Siga também a skill `git-workflow` para commits/PR.
 
-## Arquitetura em camadas (respeite sempre)
+## Arquitetura Hexagonal / Ports & Adapters (respeite sempre — ADR-0007)
+
+Dependências apontam **para dentro**: adapter → application → domain. O domínio nunca importa infra.
 
 ```
-Controller → Service → Repository → Entity/DB
+adapter/in/web → port/in → application → domain
+                                   ↓
+                               port/out ← adapter/out/persistence (JPA)
+                                        ← adapter (segurança)
 ```
 
-- **Controller**: só HTTP. Recebe DTO (`@Valid`), chama service, retorna DTO/`ResponseEntity`. **Zero regra de negócio.**
-- **Service**: regra de negócio, `@Transactional`, orquestração. É onde os testes unitários vivem.
-- **Repository**: interface Spring Data JPA. Query derivada ou `@Query`. Nada de lógica.
-- **Entity**: mapeamento JPA. **Nunca** serialize entidade na API — converta para DTO via Mapper.
+- **domain**: modelo puro + regras (ex.: `Registro`, `NomeNormalizer`, `exception/`). **Sem Spring/JPA.**
+- **application**: casos de uso implementam `port/in`, orquestram `port/out`. `@Service`,
+  `@Transactional`. É aqui que os testes unitários (com mocks das portas) vivem — sem contexto Spring.
+- **port/in**: interfaces do que o sistema oferece (`*UseCase`). Entrada por *command* (record), não DTO web.
+- **port/out**: interfaces do que o sistema precisa (`*RepositoryPort`, etc.).
+- **adapter/in/web**: `@RestController` + DTOs. Só HTTP; traduz DTO ↔ command/domínio. **Zero regra.**
+- **adapter/out/persistence**: `@Entity` JPA + Spring Data + adaptador que implementa a porta
+  (mapeia domínio ↔ entidade). **Nunca** serialize a entidade na API nem vaze `Page`/tipos Spring para dentro.
 
-## Organização (package-by-feature)
+## Organização (feature + hexagonal)
 
 ```
-com.buscarm.{registro | importacao | usuario | auditoria | seguranca | comum}
+com.buscarm
+├── <feature>/domain
+├── <feature>/application/{port/in, port/out, *ApplicationService}
+├── <feature>/adapter/{in/web, out/persistence}
+├── seguranca/   (adapters de UsuarioAtualPort/UsuarioSessaoPort + SecurityConfig)
+├── shared/      (ApiError, Pagina, web/GlobalExceptionHandler)
+└── config/
 ```
 
-`importacao` contém `planilha/` (Apache POI), `imagem/` (Tess4J/OCR) e o **único**
-`ValidadorRegistroService`. Excel e OCR produzem o mesmo `RegistroDTO` (ADR-0003) — nunca
+`importacao` (Épicos 5 e 7) segue a mesma forma: `planilha/` (Apache POI) e `imagem/` (Tess4J/OCR)
+são **adaptadores de entrada** que convergem para a **mesma porta**/validação (ADR-0003) — nunca
 duplique regra de validação/duplicidade.
 
 ## Regras de código
@@ -73,8 +88,8 @@ GET  /api/importacoes/{id}
 
 ## Checklist de PR (backend)
 
-- [ ] Camadas respeitadas (controller sem regra; service testável)
-- [ ] DTO ↔ entidade via mapper; entidade não vaza
+- [ ] Hexagonal respeitado (domínio/aplicação sem Spring/JPA; regra fora do controller)
+- [ ] Portas usadas; adaptador implementa a porta; entidade JPA e `Page` não vazam para dentro
 - [ ] Validação e tratamento de erro global
 - [ ] Migration nova (se schema mudou) — nunca editar aplicada
 - [ ] Testes unit/integração cobrindo o caso e as bordas

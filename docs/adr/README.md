@@ -22,4 +22,6 @@ de reescrever a história.
 | [0002](./0002-autenticacao-jwt.md) | Autenticação com JWT stateless | Aceito |
 | [0003](./0003-pipeline-de-importacao-unico.md) | Pipeline de importação único (Excel + OCR) | Aceito |
 | [0004](./0004-estrategia-de-branches.md) | Estratégia de branches e proteção da `main` | Aceito |
-| [0005](./0005-ci-cd.md) | CI/CD, versionamento e deploy | Proposto |
+| [0005](./0005-ci-cd.md) | CI/CD, versionamento e deploy | Aceito |
+| [0006](./0006-auditoria-de-autoria.md) | Auditoria de autoria (criado_por/atualizado_por + trigger) | Aceito |
+| [0007](./0007-backend-hexagonal.md) | Arquitetura Hexagonal no backend (Ports & Adapters) | Aceito |
