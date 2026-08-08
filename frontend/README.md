@@ -28,6 +28,7 @@ app/                                   # rotas: /, /login, /registros, /importac
 features/auth/{model,ui}/              # AuthProvider/useAuth, LoginForm, RequireAuth, AuthNav
 features/busca-registros/{ui,model}/   # BuscaRegistros, TabelaResultados + useBuscaRegistros
 features/importar-planilha/{ui,model}/ # Upload, Preview, Relatório + useImportarPlanilha
+features/importar-imagem/{ui,model}/   # Upload foto, ConferenciaOcr (edição) + useImportarImagem
 features/exportar-registros/ui/        # ExportarRegistros (download .xlsx/.csv)
 entities/registro/{model,api}/         # types + buscarRegistros + urlExportacaoRegistros
 entities/importacao/{model,api}/       # types + validarPlanilha / confirmarImportacao

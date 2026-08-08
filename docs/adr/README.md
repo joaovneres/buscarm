@@ -26,3 +26,4 @@ de reescrever a história.
 | [0006](./0006-auditoria-de-autoria.md) | Auditoria de autoria (criado_por/atualizado_por + trigger) | Aceito |
 | [0007](./0007-backend-hexagonal.md) | Arquitetura Hexagonal no backend (Ports & Adapters) | Aceito |
 | [0008](./0008-frontend-feature-sliced.md) | Frontend modular (Feature-Sliced), não Microfrontend | Aceito |
+| [0009](./0009-ocr-java-tess4j.md) | OCR por foto em Java (Tess4J), como adaptador de porta | Aceito |

@@ -50,7 +50,12 @@ Paginação: `?pagina=0&tamanho=20` (ordena por sobrenome).
 | --- | --- | --- |
 | `POST` | `/api/importacoes/planilha/validar` | Upload `.xlsx` (multipart `arquivo`) → pré-visualização classificada (**não grava**) |
 | `POST` | `/api/importacoes/planilha/confirmar` | `{importacaoId, linhasAprovadas[]}` → grava só os válidos aprovados + relatório |
+| `POST` | `/api/importacoes/imagem/processar` | Upload de **foto** (multipart) → OCR (Tess4J) → conferência (**não grava**) |
+| `POST` | `/api/importacoes/imagem/confirmar` | `{importacaoId, itens[{linha,rm,nomeCompleto}]}` → grava os itens **revisados** |
 | `GET` | `/api/importacoes/{id}` | Status/relatório da importação |
+
+> OCR requer Tesseract nativo (instalado no Dockerfile). Configurável por `buscarm.ocr.datapath`
+> e `buscarm.ocr.idioma` (padrão `por`). Ver [ADR-0009](../docs/adr/0009-ocr-java-tess4j.md).
 
 Cada linha é classificada em `VALIDO`/`INVALIDO`/`DUPLICADO`/`CONFLITO`; a gravação reusa o
 cadastro (`CadastrarRegistroUseCase`) e tudo fica rastreado em `importacao`/`importacao_item`.

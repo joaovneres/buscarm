@@ -16,6 +16,9 @@ export default function Home() {
           <li>
             <Link href="/importacao/planilha">Importar planilha →</Link>
           </li>
+          <li>
+            <Link href="/importacao/imagem">Importar por foto (OCR) →</Link>
+          </li>
         </ul>
       </nav>
     </main>
