@@ -1,5 +1,6 @@
 package com.buscarm.registro.adapter.out.persistence;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -16,4 +17,6 @@ interface RegistroSpringDataRepository extends JpaRepository<RegistroJpaEntity, 
     Page<RegistroJpaEntity> findByAtivoTrue(Pageable pageable);
 
     Page<RegistroJpaEntity> findByAtivoTrueAndNomeBuscaContaining(String termo, Pageable pageable);
+
+    List<RegistroJpaEntity> findByAtivoTrueOrderBySobrenomeAsc();
 }

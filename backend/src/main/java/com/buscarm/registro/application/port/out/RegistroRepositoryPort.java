@@ -1,5 +1,6 @@
 package com.buscarm.registro.application.port.out;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.buscarm.registro.domain.Registro;
@@ -11,6 +12,9 @@ public interface RegistroRepositoryPort {
     boolean existePorRm(int rm);
 
     Registro salvar(Registro registro);
+
+    /** Todos os registros ativos (para exportação/backup), ordenados por sobrenome. */
+    List<Registro> listarTodosAtivos();
 
     Optional<Registro> buscarPorId(long id);
 

@@ -27,7 +27,8 @@ Direção de dependência: `app → features → entities → shared`.
 app/                                   # rotas: /, /registros, /importacao/planilha
 features/busca-registros/{ui,model}/   # BuscaRegistros, TabelaResultados + useBuscaRegistros
 features/importar-planilha/{ui,model}/ # Upload, Preview, Relatório + useImportarPlanilha
-entities/registro/{model,api}/         # types + buscarRegistros
+features/exportar-registros/ui/        # ExportarRegistros (download .xlsx/.csv)
+entities/registro/{model,api}/         # types + buscarRegistros + urlExportacaoRegistros
 entities/importacao/{model,api}/       # types + validarPlanilha / confirmarImportacao
 shared/api/client.ts                   # fetch central (GET, POST JSON e multipart; trata ApiError)
 tests/                                 # unit (Vitest) + e2e (Playwright)
