@@ -112,14 +112,14 @@ Marque `[x]` ao concluir. Divisão de responsáveis será definida mais adiante.
 - [x] **T6.3** Botão/tela de exportação na UI (feature `exportar-registros` em `/registros`)
 
 ## Épico 7 — Importação por fotografia / OCR (segunda etapa)
-- [ ] **T7.1** `OCRService` com Tess4J/Tesseract (pt)
-- [ ] **T7.2** Pré-processamento de imagem (OpenCV opcional: contraste, recorte, perspectiva)
-- [ ] **T7.3** `ExtratorRegistroService`: linhas → (RM, nome) → `RegistroDTO` (reusa validador)
-- [ ] **T7.4** `POST /api/importacoes/imagem/processar` e `.../confirmar`
-- [ ] **T7.5** Tela de captura/upload de foto
-- [ ] **T7.6** Tela de conferência/edição dos resultados do OCR (checkbox + correção inline)
-- [ ] **T7.7** Integrar OCR ao mesmo pipeline da planilha
-- [ ] **T7.8** Medir desempenho do reconhecimento (nomes/RMs corretos, correções, tempo)
+- [x] **T7.1** OCR com Tess4J/Tesseract (pt) — `Tess4jExtratorAdapter` ([ADR-0009](./docs/adr/0009-ocr-java-tess4j.md))
+- [ ] **T7.2** Pré-processamento de imagem (OpenCV opcional: contraste, recorte, perspectiva) — avaliar com a foto real
+- [x] **T7.3** `ExtratorLinhasOcr`: linhas → (RM, nome) → `RegistroExtraido` (reusa o validador)
+- [x] **T7.4** `POST /api/importacoes/imagem/processar` e `.../confirmar`
+- [x] **T7.5** Tela de captura/upload de foto
+- [x] **T7.6** Tela de conferência/edição dos resultados do OCR (checkbox + correção inline)
+- [x] **T7.7** Integrar OCR ao mesmo pipeline da planilha (mesma classificação/gravação)
+- [ ] **T7.8** Medir desempenho do reconhecimento (com a secretaria / foto real)
 
 ## Épico 8 — Acessibilidade
 - [ ] **T8.1** Semântica HTML5, foco, navegação por teclado, contraste (WCAG 2.2)
