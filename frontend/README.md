@@ -24,7 +24,8 @@ npm run test:e2e   # testes ponta a ponta (Playwright)
 ## Estrutura (Feature-Sliced Design — ADR-0008)
 Direção de dependência: `app → features → entities → shared`.
 ```
-app/                                   # rotas: /, /registros, /importacao/planilha
+app/                                   # rotas: /, /login, /registros, /importacao/planilha
+features/auth/{model,ui}/              # AuthProvider/useAuth, LoginForm, RequireAuth, AuthNav
 features/busca-registros/{ui,model}/   # BuscaRegistros, TabelaResultados + useBuscaRegistros
 features/importar-planilha/{ui,model}/ # Upload, Preview, Relatório + useImportarPlanilha
 features/exportar-registros/ui/        # ExportarRegistros (download .xlsx/.csv)

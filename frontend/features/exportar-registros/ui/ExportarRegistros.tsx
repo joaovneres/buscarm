@@ -1,17 +1,23 @@
-import { urlExportacaoRegistros } from '@/entities/registro/api/exportarRegistros';
+'use client';
 
-/** Botões de download da exportação dos registros (backup de negócio). */
+import { baixarArquivo } from '@/shared/api/client';
+
+/** Botões de download da exportação dos registros (autenticado via token). */
 export function ExportarRegistros() {
+  function exportar(formato: 'xlsx' | 'csv') {
+    void baixarArquivo('/api/registros/exportar', { formato }, `registros.${formato}`);
+  }
+
   return (
     <section aria-label="Exportar registros">
       <h2>Exportar</h2>
       <p>Baixe todos os registros ativos para conferência ou backup.</p>
-      <a href={urlExportacaoRegistros('xlsx')} download>
+      <button type="button" onClick={() => exportar('xlsx')}>
         Exportar .xlsx
-      </a>{' '}
-      <a href={urlExportacaoRegistros('csv')} download>
+      </button>{' '}
+      <button type="button" onClick={() => exportar('csv')}>
         Exportar .csv
-      </a>
+      </button>
     </section>
   );
 }

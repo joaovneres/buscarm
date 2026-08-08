@@ -15,6 +15,7 @@ import com.buscarm.importacao.domain.exception.ImportacaoNaoEncontradaException;
 import com.buscarm.registro.domain.exception.RegistroDuplicadoException;
 import com.buscarm.registro.domain.exception.RegistroNaoEncontradoException;
 import com.buscarm.shared.ApiError;
+import com.buscarm.usuario.domain.exception.CredenciaisInvalidasException;
 
 /** Traduz exceções de domínio/validação em respostas {@link ApiError} consistentes. */
 @RestControllerAdvice
@@ -39,6 +40,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleArgumentoInvalido(IllegalArgumentException ex,
                                                             HttpServletRequest req) {
         return construir(HttpStatus.BAD_REQUEST, "ARQUIVO_INVALIDO", ex.getMessage(), req, List.of());
+    }
+
+    @ExceptionHandler(CredenciaisInvalidasException.class)
+    public ResponseEntity<ApiError> handleCredenciais(CredenciaisInvalidasException ex,
+                                                      HttpServletRequest req) {
+        return construir(HttpStatus.UNAUTHORIZED, "CREDENCIAIS_INVALIDAS", ex.getMessage(), req, List.of());
     }
 
     @ExceptionHandler(RegistroDuplicadoException.class)
