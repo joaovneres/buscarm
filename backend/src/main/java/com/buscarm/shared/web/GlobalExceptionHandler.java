@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.buscarm.importacao.domain.exception.ImportacaoNaoEncontradaException;
 import com.buscarm.registro.domain.exception.RegistroDuplicadoException;
 import com.buscarm.registro.domain.exception.RegistroNaoEncontradoException;
 import com.buscarm.shared.ApiError;
@@ -28,10 +29,16 @@ public class GlobalExceptionHandler {
         return construir(HttpStatus.BAD_REQUEST, "VALIDACAO", "Dados inválidos", req, campos);
     }
 
-    @ExceptionHandler(RegistroNaoEncontradoException.class)
-    public ResponseEntity<ApiError> handleNaoEncontrado(RegistroNaoEncontradoException ex,
+    @ExceptionHandler({RegistroNaoEncontradoException.class, ImportacaoNaoEncontradaException.class})
+    public ResponseEntity<ApiError> handleNaoEncontrado(RuntimeException ex,
                                                         HttpServletRequest req) {
         return construir(HttpStatus.NOT_FOUND, "NAO_ENCONTRADO", ex.getMessage(), req, List.of());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiError> handleArgumentoInvalido(IllegalArgumentException ex,
+                                                            HttpServletRequest req) {
+        return construir(HttpStatus.BAD_REQUEST, "ARQUIVO_INVALIDO", ex.getMessage(), req, List.of());
     }
 
     @ExceptionHandler(RegistroDuplicadoException.class)

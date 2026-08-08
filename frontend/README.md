@@ -24,12 +24,17 @@ npm run test:e2e   # testes ponta a ponta (Playwright)
 ## Estrutura (Feature-Sliced Design — ADR-0008)
 Direção de dependência: `app → features → entities → shared`.
 ```
-app/                                   # rotas (App Router): /, /registros
+app/                                   # rotas: /, /registros, /importacao/planilha
 features/busca-registros/{ui,model}/   # BuscaRegistros, TabelaResultados + useBuscaRegistros
-entities/registro/{model,api}/         # types (espelham DTOs) + buscarRegistros
-shared/api/client.ts                   # cliente central de fetch (trata ApiError do backend)
+features/importar-planilha/{ui,model}/ # Upload, Preview, Relatório + useImportarPlanilha
+entities/registro/{model,api}/         # types + buscarRegistros
+entities/importacao/{model,api}/       # types + validarPlanilha / confirmarImportacao
+shared/api/client.ts                   # fetch central (GET, POST JSON e multipart; trata ApiError)
 tests/                                 # unit (Vitest) + e2e (Playwright)
 ```
+
+Fluxo de importação (`/importacao/planilha`): upload `.xlsx` → **pré-visualização** classificada
+(seleção só dos válidos) → **confirmação** → relatório. Nada grava sem confirmação humana.
 
 ## Fluxo atual (Épico 4 — parcial)
 Tela `/registros`: busca por **nome** (parcial, acento-insensível) ou por **RM**, com destaque do
