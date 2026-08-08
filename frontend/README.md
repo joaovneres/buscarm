@@ -21,12 +21,14 @@ npm run test       # testes unitários (Vitest + Testing Library)
 npm run test:e2e   # testes ponta a ponta (Playwright)
 ```
 
-## Estrutura (feature-first)
+## Estrutura (Feature-Sliced Design — ADR-0008)
+Direção de dependência: `app → features → entities → shared`.
 ```
-app/                 # rotas (App Router): /, /registros
-features/registros/  # api, hooks, types, components (BuscaRegistros, TabelaResultados)
-lib/api.ts           # cliente central de fetch (trata ApiError do backend)
-tests/               # unit (Vitest) + e2e (Playwright)
+app/                                   # rotas (App Router): /, /registros
+features/busca-registros/{ui,model}/   # BuscaRegistros, TabelaResultados + useBuscaRegistros
+entities/registro/{model,api}/         # types (espelham DTOs) + buscarRegistros
+shared/api/client.ts                   # cliente central de fetch (trata ApiError do backend)
+tests/                                 # unit (Vitest) + e2e (Playwright)
 ```
 
 ## Fluxo atual (Épico 4 — parcial)

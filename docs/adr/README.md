@@ -23,3 +23,4 @@ de reescrever a história.
 | [0003](./0003-pipeline-de-importacao-unico.md) | Pipeline de importação único (Excel + OCR) | Aceito |
 | [0004](./0004-estrategia-de-branches.md) | Estratégia de branches e proteção da `main` | Aceito |
 | [0005](./0005-ci-cd.md) | CI/CD, versionamento e deploy | Proposto |
+| [0008](./0008-frontend-feature-sliced.md) | Frontend modular (Feature-Sliced), não Microfrontend | Aceito |

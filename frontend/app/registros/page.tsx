@@ -1,4 +1,4 @@
-import { BuscaRegistros } from '@/features/registros/components/BuscaRegistros';
+import { BuscaRegistros } from '@/features/busca-registros/ui/BuscaRegistros';
 
 export default function RegistrosPage() {
   return (

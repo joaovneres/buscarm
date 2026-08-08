@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from 'react';
 
-import { useBuscaRegistros } from '../hooks';
+import { useBuscaRegistros } from '../model/useBuscaRegistros';
 import { TabelaResultados } from './TabelaResultados';
 
 type TipoBusca = 'nome' | 'rm';

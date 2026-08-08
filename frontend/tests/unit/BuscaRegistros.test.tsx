@@ -2,8 +2,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { BuscaRegistros } from '@/features/registros/components/BuscaRegistros';
-import * as api from '@/features/registros/api';
+import { BuscaRegistros } from '@/features/busca-registros/ui/BuscaRegistros';
+import * as api from '@/entities/registro/api/buscarRegistros';
 
 describe('BuscaRegistros', () => {
   beforeEach(() => {

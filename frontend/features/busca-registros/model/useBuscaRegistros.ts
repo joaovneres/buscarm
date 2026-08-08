@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 
-import { buscarRegistros } from './api';
-import type { RegistroResponse } from './types';
+import { buscarRegistros } from '@/entities/registro/api/buscarRegistros';
+import type { RegistroResponse } from '@/entities/registro/model/types';
 
 export type EstadoBusca = 'idle' | 'loading' | 'sucesso' | 'erro';
 

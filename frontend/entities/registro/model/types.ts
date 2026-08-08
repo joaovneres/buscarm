@@ -1,4 +1,4 @@
-/** Espelha os DTOs do backend (com.buscarm.registro.dto). */
+/** Modelo da entidade Registro no frontend — espelha os DTOs do backend. */
 export interface RegistroResponse {
   id: number;
   rm: number;

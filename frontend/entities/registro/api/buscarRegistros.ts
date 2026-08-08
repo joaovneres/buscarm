@@ -1,8 +1,8 @@
-import { apiGet } from '@/lib/api';
+import { apiGet } from '@/shared/api/client';
 
-import type { PaginaResponse, RegistroResponse } from './types';
+import type { PaginaResponse, RegistroResponse } from '../model/types';
 
-/** Busca registros por nome (parcial, acento-insensível) ou por RM. */
+/** Acesso a dados da entidade Registro: busca por nome (acento-insensível) ou por RM. */
 export function buscarRegistros(
   params: { nome?: string; rm?: string },
 ): Promise<PaginaResponse<RegistroResponse>> {

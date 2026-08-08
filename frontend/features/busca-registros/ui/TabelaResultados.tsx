@@ -1,4 +1,4 @@
-import type { RegistroResponse } from '../types';
+import type { RegistroResponse } from '@/entities/registro/model/types';
 
 export function TabelaResultados({ registros }: { registros: RegistroResponse[] }) {
   if (registros.length === 0) {
