@@ -47,3 +47,6 @@ Thumbs.db
 uploads/
 tmp/
 *.log
+
+# ---- Backups gerados localmente (scripts/backup.sh) ----
+backups/

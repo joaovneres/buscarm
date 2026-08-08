@@ -106,9 +106,9 @@ Marque `[x]` ao concluir. Divisão de responsáveis será definida mais adiante.
 - [ ] **T5.12** Importar amostra controlada da planilha real (com a secretaria)
 
 ## Épico 6 — Exportação e backup
-- [ ] **T6.1** API exportação dos registros (.xlsx/.csv)
-- [ ] **T6.2** Estratégia de backup do banco (dump/rotina)
-- [ ] **T6.3** Botão/tela de exportação na UI
+- [x] **T6.1** API exportação dos registros (.xlsx/.csv) — `GET /api/registros/exportar?formato=`
+- [x] **T6.2** Estratégia de backup do banco (Neon PITR/branch + `scripts/backup.sh` pg_dump) — ver [docs/BACKUP.md](./docs/BACKUP.md)
+- [x] **T6.3** Botão/tela de exportação na UI (feature `exportar-registros` em `/registros`)
 
 ## Épico 7 — Importação por fotografia / OCR (segunda etapa)
 - [ ] **T7.1** `OCRService` com Tess4J/Tesseract (pt)

@@ -24,6 +24,19 @@ async function tratar<T>(res: Response): Promise<T> {
   return (await res.json()) as T;
 }
 
+/** URL absoluta da API (para downloads via link/âncora). */
+export function urlApi(path: string, params?: Record<string, string>): string {
+  const url = new URL(path, BASE_URL);
+  if (params) {
+    Object.entries(params).forEach(([chave, valor]) => {
+      if (valor) {
+        url.searchParams.set(chave, valor);
+      }
+    });
+  }
+  return url.toString();
+}
+
 /** Leitura (GET) com query params. */
 export async function apiGet<T>(path: string, params?: Record<string, string>): Promise<T> {
   const url = new URL(path, BASE_URL);

@@ -2,7 +2,9 @@ package com.buscarm.registro.adapter.in.web;
 
 import jakarta.validation.Valid;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +20,9 @@ import com.buscarm.registro.adapter.in.web.dto.RegistroWebMapper;
 import com.buscarm.registro.application.port.in.BuscarRegistrosUseCase;
 import com.buscarm.registro.application.port.in.CadastrarRegistroUseCase;
 import com.buscarm.registro.application.port.in.CadastrarRegistroUseCase.CadastrarRegistroCommand;
+import com.buscarm.registro.application.port.in.ExportarRegistrosUseCase;
+import com.buscarm.registro.domain.FormatoExportacao;
+import com.buscarm.shared.ArquivoExportado;
 import com.buscarm.shared.Pagina;
 
 /** Adaptador de entrada (driving): expõe os casos de uso via HTTP. */
@@ -27,11 +32,14 @@ public class RegistroController {
 
     private final CadastrarRegistroUseCase cadastrarRegistro;
     private final BuscarRegistrosUseCase buscarRegistros;
+    private final ExportarRegistrosUseCase exportarRegistros;
 
     public RegistroController(CadastrarRegistroUseCase cadastrarRegistro,
-                             BuscarRegistrosUseCase buscarRegistros) {
+                             BuscarRegistrosUseCase buscarRegistros,
+                             ExportarRegistrosUseCase exportarRegistros) {
         this.cadastrarRegistro = cadastrarRegistro;
         this.buscarRegistros = buscarRegistros;
+        this.exportarRegistros = exportarRegistros;
     }
 
     @PostMapping
@@ -44,6 +52,20 @@ public class RegistroController {
     @GetMapping("/{id}")
     public RegistroResponse buscarPorId(@PathVariable long id) {
         return RegistroWebMapper.paraResponse(buscarRegistros.buscarPorId(id));
+    }
+
+    /** Exporta todos os registros ativos (.xlsx por padrão, ou ?formato=csv). */
+    @GetMapping("/exportar")
+    public ResponseEntity<byte[]> exportar(@RequestParam(defaultValue = "xlsx") String formato) {
+        FormatoExportacao fmt = "csv".equalsIgnoreCase(formato)
+                ? FormatoExportacao.CSV
+                : FormatoExportacao.XLSX;
+        ArquivoExportado arquivo = exportarRegistros.exportar(fmt);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + arquivo.nomeArquivo() + "\"")
+                .contentType(MediaType.parseMediaType(arquivo.contentType()))
+                .body(arquivo.conteudo());
     }
 
     /** Pesquisa por nome (parcial, acento-insensível) OU por RM. */

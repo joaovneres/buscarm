@@ -1,5 +1,6 @@
 package com.buscarm.registro.adapter.out.persistence;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -31,6 +32,13 @@ public class RegistroPersistenceAdapter implements RegistroRepositoryPort {
     public Registro salvar(Registro registro) {
         RegistroJpaEntity salvo = repository.save(RegistroPersistenceMapper.paraNovaEntidade(registro));
         return RegistroPersistenceMapper.paraDominio(salvo);
+    }
+
+    @Override
+    public List<Registro> listarTodosAtivos() {
+        return repository.findByAtivoTrueOrderBySobrenomeAsc().stream()
+                .map(RegistroPersistenceMapper::paraDominio)
+                .toList();
     }
 
     @Override
