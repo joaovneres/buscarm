@@ -17,11 +17,12 @@ build/
 hs_err_pid*
 
 # ---- Node / Next.js (frontend) ----
+# Ancorados em frontend/ para não capturar pacotes Java como .../adapter/out ou port/out.
 node_modules/
-.next/
-out/
-dist/
-coverage/
+frontend/.next/
+frontend/out/
+frontend/dist/
+frontend/coverage/
 *.tsbuildinfo
 next-env.d.ts
 .vercel/

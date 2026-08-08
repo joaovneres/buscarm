@@ -31,59 +31,64 @@ Princípios que valem para os dois lados:
 
 ---
 
-## 2. Backend (Spring Boot)
+## 2. Backend (Spring Boot) — Arquitetura Hexagonal
 
-### 2.1 Arquitetura em camadas
+Padrão adotado: **Hexagonal / Ports & Adapters** (ver [ADR-0007](./adr/0007-backend-hexagonal.md)).
+O domínio e a aplicação não conhecem framework; adaptadores na borda implementam/consomem portas.
+
+### 2.1 As camadas e a regra da dependência
 
 ```
-Controller  →  Service  →  Repository  →  Entity/DB
-   (Web)       (regras)     (Spring Data)   (JPA)
-     │            │
-     ▼            ▼
-   DTO  ◀──────  Mapper
+        adapter/in/web  ──▶  port/in ─┐
+        (REST, DTOs)                  │
+                                      ▼
+                            application (casos de uso)  ──▶  domain (regras puras)
+                                      │
+                                      ▼
+        port/out ◀── adapter/out/persistence (JPA)
+                 ◀── adapter (segurança: usuário da sessão)
 ```
 
-- **Controller** (`*Controller`): só HTTP. Recebe/valida DTO de entrada, chama service, devolve
-  DTO/`ResponseEntity`. Zero regra de negócio.
-- **Service** (`*Service`): regra de negócio, transações (`@Transactional`), orquestração. É onde
-  os testes unitários concentram.
-- **Repository** (`*Repository`): interface Spring Data JPA. Queries derivadas ou `@Query`.
-- **Entity** (`*`): mapeamento JPA. Não sai da camada de persistência — nunca serializar entidade direto.
-- **DTO** (`*Request`/`*Response`): contrato da API. Conversão via **Mapper** dedicado.
+- **domain**: modelo puro + regras (`Registro`, `NomeNormalizer`, exceptions). Sem Spring/JPA.
+- **application**: casos de uso (implementam `port/in`) orquestrando `port/out`. Sem framework de infra.
+- **port/in**: o que o mundo pode pedir ao sistema (`CadastrarRegistroUseCase`, `BuscarRegistrosUseCase`).
+- **port/out**: o que o sistema precisa da infra (`RegistroRepositoryPort`, `UsuarioAtualPort`, `UsuarioSessaoPort`).
+- **adapter/in/web**: `RestController` + DTOs (traduz HTTP ↔ comandos/domínio).
+- **adapter/out/persistence**: entidade JPA + Spring Data + adaptador que implementa a porta (mapeia domínio ↔ entidade).
 
-### 2.2 Organização por pacotes (package-by-feature)
+As dependências apontam **para dentro**: adaptadores → aplicação → domínio. O domínio nunca importa infra.
+
+### 2.2 Organização por pacotes (feature + hexagonal)
 
 ```
 com.buscarm
-├── registro         # cadastro/pesquisa de registros de matrícula
-│   ├── RegistroController
-│   ├── RegistroService
-│   ├── RegistroRepository
-│   ├── Registro (entity)
-│   └── dto/  mapper/
-├── importacao       # pipeline compartilhado Excel + OCR
-│   ├── planilha/    # LeitorPlanilhaService (Apache POI)
-│   ├── imagem/      # OCRService (Tess4J) + ExtratorRegistroService
-│   ├── ValidadorRegistroService   # regra única de validação/duplicidade/conflito
-│   ├── ImportacaoController
-│   └── dto/ (RegistroDTO comum)
-├── usuario          # autenticação/usuários
-├── auditoria        # log de ações sensíveis
-├── seguranca        # config Spring Security, JWT, CORS
-└── comum            # exceptions, ApiError, GlobalExceptionHandler, config
+├── registro
+│   ├── domain/                    # Registro, NomeNormalizer, exception/
+│   ├── application/
+│   │   ├── port/in/               # CadastrarRegistroUseCase, BuscarRegistrosUseCase
+│   │   ├── port/out/              # RegistroRepositoryPort, UsuarioAtualPort, UsuarioSessaoPort
+│   │   └── RegistroApplicationService
+│   └── adapter/
+│       ├── in/web/                # RegistroController + dto/
+│       └── out/persistence/       # RegistroJpaEntity, SpringData, Adapter, Mapper
+├── importacao/  (Épicos 5 e 7 — mesma forma: OCR/POI são adapters da mesma porta)
+├── seguranca/                     # SecurityConfig + adapters de UsuarioAtualPort/UsuarioSessaoPort
+├── shared/                        # ApiError, Pagina, web/GlobalExceptionHandler
+└── config/                        # JpaAuditingConfig
 ```
 
 ### 2.3 Padrões de design aplicados
 
 | Padrão | Onde | Por quê |
 | --- | --- | --- |
-| **Layered architecture** | todo o back | separação clara, testabilidade |
-| **Repository** | Spring Data JPA | abstrai persistência |
-| **DTO + Mapper** | fronteira da API | não vazar entidade; contrato estável |
-| **Strategy** | leitura de origem (`LeitorPlanilha` × `ExtratorOCR`) | mesma saída (`RegistroDTO`), fontes diferentes |
-| **Pipeline** | importação: extrair → normalizar → validar → pré-visualizar → confirmar | reuso entre Excel e OCR |
-| **Dependency Injection** | Spring (construtor) | testável, sem `new` acoplado |
-| **Global Exception Handler** | `@ControllerAdvice` | erros consistentes (`ApiError`) |
+| **Hexagonal (Ports & Adapters)** | todo o back | isola domínio de framework/infra; testável |
+| **Ports** (interfaces in/out) | `application/port` | inverte dependências; adaptadores plugáveis |
+| **Adapter** | web, persistência, segurança | tradução entre borda e aplicação |
+| **DTO/Command + Mapper** | web ↔ aplicação ↔ domínio | não vaza entidade JPA nem tipo web para dentro |
+| **Strategy** | extração de origem (`POI` × `OCR`) para a mesma porta | mesma regra, fontes diferentes |
+| **Pipeline** | importação: extrair → validar → pré-visualizar → confirmar | reuso entre Excel e OCR |
+| **Dependency Injection** | Spring (construtor) nos adaptadores/serviço | testável, sem `new` acoplado |
+| **Global Exception Handler** | `@RestControllerAdvice` (shared/web) | erros consistentes (`ApiError`) |
 | **Soft delete** | `ativo=false` em vez de DELETE | preserva integridade e auditoria |
 
 ### 2.4 Contratos e erros
