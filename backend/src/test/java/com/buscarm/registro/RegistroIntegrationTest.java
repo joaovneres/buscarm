@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ import com.buscarm.registro.adapter.in.web.dto.RegistroRequest;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
+@WithMockUser(username = "secretaria", roles = {"SECRETARIA"})
 class RegistroIntegrationTest {
 
     @Autowired
@@ -40,8 +42,8 @@ class RegistroIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.rm").value(203))
                 .andExpect(jsonPath("$.sobrenome").value("Sousa"))
-                .andExpect(jsonPath("$.criadoPor").value("sistema"))
-                .andExpect(jsonPath("$.atualizadoPor").value("sistema"));
+                .andExpect(jsonPath("$.criadoPor").value("secretaria"))
+                .andExpect(jsonPath("$.atualizadoPor").value("secretaria"));
 
         mvc.perform(get("/api/registros").param("nome", "joao"))
                 .andExpect(status().isOk())

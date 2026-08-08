@@ -1,16 +1,33 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ExportarRegistros } from '@/features/exportar-registros/ui/ExportarRegistros';
+import { baixarArquivo } from '@/shared/api/client';
+
+vi.mock('@/shared/api/client', () => ({ baixarArquivo: vi.fn() }));
 
 describe('ExportarRegistros', () => {
-  it('oferece download em .xlsx e .csv', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('baixa a exportação em .xlsx e .csv', async () => {
+    const user = userEvent.setup();
     render(<ExportarRegistros />);
 
-    const xlsx = screen.getByRole('link', { name: /\.xlsx/i });
-    const csv = screen.getByRole('link', { name: /\.csv/i });
+    await user.click(screen.getByRole('button', { name: /\.xlsx/i }));
+    expect(baixarArquivo).toHaveBeenCalledWith(
+      '/api/registros/exportar',
+      { formato: 'xlsx' },
+      expect.stringContaining('xlsx'),
+    );
 
-    expect(xlsx).toHaveAttribute('href', expect.stringContaining('formato=xlsx'));
-    expect(csv).toHaveAttribute('href', expect.stringContaining('formato=csv'));
+    await user.click(screen.getByRole('button', { name: /\.csv/i }));
+    expect(baixarArquivo).toHaveBeenCalledWith(
+      '/api/registros/exportar',
+      { formato: 'csv' },
+      expect.stringContaining('csv'),
+    );
   });
 });

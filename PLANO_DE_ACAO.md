@@ -75,10 +75,11 @@ Marque `[x]` ao concluir. Divisão de responsáveis será definida mais adiante.
 - [ ] **T2.6** Configurar CORS para o frontend
 
 ## Épico 3 — Autenticação e autorização
-- [ ] **T3.1** Spring Security + login com **JWT (stateless)** — ver [ADR-0002](./docs/adr/0002-autenticacao-jwt.md)
-- [ ] **T3.2** Papéis (ex.: `SECRETARIA`, `ADMIN`) e proteção de endpoints
-- [ ] **T3.3** Seed de usuário admin inicial
-- [ ] **T3.4** Hash de senha (BCrypt) e regras mínimas de segurança
+- [x] **T3.1** Spring Security + login com **JWT (stateless)** — `POST /api/auth/login` ([ADR-0002](./docs/adr/0002-autenticacao-jwt.md))
+- [x] **T3.2** Papéis (`SECRETARIA`, `ADMIN`) e proteção de endpoints (filtro JWT + entry point 401)
+- [x] **T3.3** Seed de usuário admin inicial (`UsuarioAdminSeeder`)
+- [x] **T3.4** Hash de senha (BCrypt) e regras mínimas de segurança
+- Frontend: tela `/login`, `AuthProvider`/`useAuth`, `RequireAuth` (rotas protegidas), token no `shared/api/client`
 
 ## Épico 4 — Cadastro manual e pesquisa
 - [ ] **T4.1** API cadastro manual `POST /api/registros`

@@ -26,6 +26,13 @@ mvn spring-boot:run
 - Swagger UI: `http://localhost:8080/swagger-ui.html`
 - Health: `http://localhost:8080/actuator/health`
 
+## Autenticação (Épico 3 — JWT)
+- `POST /api/auth/login` (público) → `{ token, nome, email, papel }`. Envie o token nas demais
+  chamadas em `Authorization: Bearer <token>`. Sem token → 401.
+- Papéis `SECRETARIA`/`ADMIN`; `/api/auditoria/**` exige ADMIN. Senhas em BCrypt.
+- **Admin inicial** criado no 1º start se não houver usuários (`buscarm.admin.email`/`.senha`,
+  padrão `admin@buscarm.local`/`admin12345` — **troque em produção**).
+
 ## Endpoints (Épico 4 — parcial)
 | Método | Rota | Descrição |
 | --- | --- | --- |
