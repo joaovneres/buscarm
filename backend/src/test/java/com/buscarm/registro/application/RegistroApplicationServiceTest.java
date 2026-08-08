@@ -13,10 +13,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.buscarm.auditoria.application.port.in.RegistrarAuditoriaUseCase;
 import com.buscarm.registro.application.port.in.CadastrarRegistroUseCase.CadastrarRegistroCommand;
 import com.buscarm.registro.application.port.out.RegistroRepositoryPort;
-import com.buscarm.registro.application.port.out.UsuarioAtualPort;
 import com.buscarm.registro.application.port.out.UsuarioSessaoPort;
+import com.buscarm.shared.UsuarioAtualPort;
 import com.buscarm.registro.domain.Registro;
 import com.buscarm.registro.domain.exception.RegistroDuplicadoException;
 
@@ -35,6 +36,9 @@ class RegistroApplicationServiceTest {
 
     @Mock
     private UsuarioSessaoPort usuarioSessao;
+
+    @Mock
+    private RegistrarAuditoriaUseCase registrarAuditoria;
 
     @InjectMocks
     private RegistroApplicationService service;

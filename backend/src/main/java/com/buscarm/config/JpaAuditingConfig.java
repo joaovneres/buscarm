@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-import com.buscarm.registro.application.port.out.UsuarioAtualPort;
+import com.buscarm.shared.UsuarioAtualPort;
 
 /** Liga a auditoria de autoria (@CreatedBy/@LastModifiedBy) ao usuário da sessão (porta). */
 @Configuration

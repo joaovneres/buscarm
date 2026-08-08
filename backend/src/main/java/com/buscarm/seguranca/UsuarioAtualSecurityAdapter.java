@@ -5,7 +5,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import com.buscarm.registro.application.port.out.UsuarioAtualPort;
+import com.buscarm.shared.UsuarioAtualPort;
 
 /**
  * Adaptador de saída para {@link UsuarioAtualPort}. Hoje, sem autenticação (Épico 3), retorna

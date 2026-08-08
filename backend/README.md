@@ -41,6 +41,7 @@ mvn spring-boot:run
 | `GET` | `/api/registros?rm=` | Pesquisa por RM |
 | `GET` | `/api/registros/{id}` | Busca por id |
 | `GET` | `/api/registros/exportar?formato=xlsx\|csv` | Exporta todos os ativos (download) — Épico 6 |
+| `GET` | `/api/auditoria?pagina=&tamanho=` | Histórico de ações sensíveis — **ADMIN** (Épico 9) |
 
 Paginação: `?pagina=0&tamanho=20` (ordena por sobrenome).
 
