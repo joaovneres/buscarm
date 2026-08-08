@@ -1,8 +1,8 @@
-package com.buscarm.registro.dto;
+package com.buscarm.registro.adapter.in.web.dto;
 
 import java.time.Instant;
 
-/** Dados de saída de um registro. */
+/** DTO de saída da API. */
 public record RegistroResponse(
         Long id,
         Integer rm,

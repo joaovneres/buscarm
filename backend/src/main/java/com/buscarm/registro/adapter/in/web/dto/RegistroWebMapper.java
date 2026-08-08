@@ -1,11 +1,11 @@
-package com.buscarm.registro.dto;
+package com.buscarm.registro.adapter.in.web.dto;
 
-import com.buscarm.registro.Registro;
+import com.buscarm.registro.domain.Registro;
 
-/** Conversão entre entidade e DTO de saída. */
-public final class RegistroMapper {
+/** Conversão entre o modelo de domínio e os DTOs da web. */
+public final class RegistroWebMapper {
 
-    private RegistroMapper() {
+    private RegistroWebMapper() {
     }
 
     public static RegistroResponse paraResponse(Registro r) {

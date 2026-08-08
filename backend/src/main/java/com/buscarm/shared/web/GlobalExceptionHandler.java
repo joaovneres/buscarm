@@ -1,4 +1,4 @@
-package com.buscarm.comum;
+package com.buscarm.shared.web;
 
 import java.time.Instant;
 import java.util.List;
@@ -11,7 +11,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-/** Converte exceções em respostas {@link ApiError} consistentes. */
+import com.buscarm.registro.domain.exception.RegistroDuplicadoException;
+import com.buscarm.registro.domain.exception.RegistroNaoEncontradoException;
+import com.buscarm.shared.ApiError;
+
+/** Traduz exceções de domínio/validação em respostas {@link ApiError} consistentes. */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -24,14 +28,15 @@ public class GlobalExceptionHandler {
         return construir(HttpStatus.BAD_REQUEST, "VALIDACAO", "Dados inválidos", req, campos);
     }
 
-    @ExceptionHandler(RecursoNaoEncontradoException.class)
-    public ResponseEntity<ApiError> handleNaoEncontrado(RecursoNaoEncontradoException ex,
+    @ExceptionHandler(RegistroNaoEncontradoException.class)
+    public ResponseEntity<ApiError> handleNaoEncontrado(RegistroNaoEncontradoException ex,
                                                         HttpServletRequest req) {
         return construir(HttpStatus.NOT_FOUND, "NAO_ENCONTRADO", ex.getMessage(), req, List.of());
     }
 
-    @ExceptionHandler(RegraNegocioException.class)
-    public ResponseEntity<ApiError> handleRegra(RegraNegocioException ex, HttpServletRequest req) {
+    @ExceptionHandler(RegistroDuplicadoException.class)
+    public ResponseEntity<ApiError> handleDuplicado(RegistroDuplicadoException ex,
+                                                    HttpServletRequest req) {
         return construir(HttpStatus.CONFLICT, "REGRA_NEGOCIO", ex.getMessage(), req, List.of());
     }
 

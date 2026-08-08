@@ -1,10 +1,10 @@
-package com.buscarm.registro.dto;
+package com.buscarm.registro.adapter.in.web.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
-/** Dados de entrada para cadastro/alteração de um registro. */
+/** DTO de entrada da API para cadastro de um registro. */
 public record RegistroRequest(
         @NotNull(message = "RM é obrigatório")
         @Positive(message = "RM deve ser positivo")

@@ -1,4 +1,4 @@
-package com.buscarm.comum;
+package com.buscarm.config;
 
 import java.util.Optional;
 
@@ -7,15 +7,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-import com.buscarm.seguranca.UsuarioAtualProvider;
+import com.buscarm.registro.application.port.out.UsuarioAtualPort;
 
-/** Habilita a auditoria de autoria (@CreatedBy/@LastModifiedBy) pelo usuário da sessão. */
+/** Liga a auditoria de autoria (@CreatedBy/@LastModifiedBy) ao usuário da sessão (porta). */
 @Configuration
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
 public class JpaAuditingConfig {
 
     @Bean
-    AuditorAware<String> auditorAware(UsuarioAtualProvider provider) {
-        return () -> Optional.of(provider.getUsuario());
+    AuditorAware<String> auditorAware(UsuarioAtualPort usuarioAtual) {
+        return () -> Optional.of(usuarioAtual.getUsuarioAtual());
     }
 }

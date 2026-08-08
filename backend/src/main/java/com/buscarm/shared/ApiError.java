@@ -1,4 +1,4 @@
-package com.buscarm.comum;
+package com.buscarm.shared;
 
 import java.time.Instant;
 import java.util.List;

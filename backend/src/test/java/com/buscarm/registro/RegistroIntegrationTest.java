@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -15,27 +14,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.buscarm.registro.dto.RegistroRequest;
+import com.buscarm.registro.adapter.in.web.dto.RegistroRequest;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Transactional
 class RegistroIntegrationTest {
 
     @Autowired
     private MockMvc mvc;
 
     @Autowired
-    private RegistroRepository repository;
-
-    @Autowired
     private ObjectMapper objectMapper;
-
-    @BeforeEach
-    void limpar() {
-        repository.deleteAll();
-    }
 
     @Test
     void criaEBuscaPorNomeSemAcento() throws Exception {

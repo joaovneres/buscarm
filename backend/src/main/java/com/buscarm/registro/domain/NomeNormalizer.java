@@ -1,17 +1,17 @@
-package com.buscarm.comum;
+package com.buscarm.registro.domain;
 
 import java.text.Normalizer;
 
 /**
- * Normalização de nomes para busca acento/caixa-insensível e extração do sobrenome
- * a partir do formato "Sobrenome, Restante do nome" usado no livro de RM.
+ * Regra de domínio: normalização de nomes para busca acento/caixa-insensível e extração do
+ * sobrenome a partir do formato "Sobrenome, Restante do nome" usado no livro de RM.
  */
 public final class NomeNormalizer {
 
     private NomeNormalizer() {
     }
 
-    /** minúsculas, sem acentos, espaços colapsados — usado na coluna nome_busca. */
+    /** minúsculas, sem acentos, espaços colapsados — base da busca por nome. */
     public static String normalizar(String texto) {
         if (texto == null) {
             return "";

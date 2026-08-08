@@ -36,14 +36,25 @@ mvn spring-boot:run
 
 Paginação: `?pagina=0&tamanho=20` (ordena por sobrenome).
 
-## Estrutura
+## Estrutura (Arquitetura Hexagonal — ADR-0007)
 ```
 com.buscarm
-├── registro   # entidade, repositório, serviço, controller, DTOs
-├── comum      # ApiError, exceções, NomeNormalizer, PaginaResponse
-├── seguranca  # SecurityConfig (JWT chega no Épico 3)
+├── registro
+│   ├── domain/                 # Registro, NomeNormalizer, exception/ (regras puras)
+│   ├── application/
+│   │   ├── port/in/            # *UseCase (portas de entrada)
+│   │   ├── port/out/           # *Port (portas de saída)
+│   │   └── RegistroApplicationService
+│   └── adapter/
+│       ├── in/web/             # RegistroController + dto/
+│       └── out/persistence/    # RegistroJpaEntity, SpringData, Adapter, Mapper
+├── seguranca/                  # SecurityConfig + adapters de usuário (JWT no Épico 3)
+├── shared/                     # ApiError, Pagina, web/GlobalExceptionHandler
+├── config/                     # JpaAuditingConfig
 └── db/migration (Flyway)
 ```
+O domínio/aplicação não dependem de Spring/JPA — testáveis com mocks das portas
+(`RegistroApplicationServiceTest`).
 
 > Segurança está **temporariamente aberta** (permitAll) até o Épico 3 (JWT — ADR-0002).
 

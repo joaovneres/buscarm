@@ -1,4 +1,4 @@
-package com.buscarm.comum;
+package com.buscarm.registro.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
