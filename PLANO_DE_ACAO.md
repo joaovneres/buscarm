@@ -92,18 +92,18 @@ Marque `[x]` ao concluir. Divisão de responsáveis será definida mais adiante.
 - [ ] **T4.9** Ação de desativar registro na UI
 
 ## Épico 5 — Importação por Excel *[coração do MVP]*
-- [ ] **T5.1** `LeitorPlanilhaService` com Apache POI (.xlsx) — reconhece colunas Nome + RM
-- [ ] **T5.2** Normalização de registros (mesmo `RegistroDTO` da foto)
-- [ ] **T5.3** `ValidadorRegistroService`: VALIDO, INVALIDO (RM/nome ausente), DUPLICADO, CONFLITO (RM igual, nome diferente)
-- [ ] **T5.4** `POST /api/importacoes/planilha/validar` → retorna resumo + itens (NÃO grava)
-- [ ] **T5.5** `POST /api/importacoes/planilha/confirmar` → efetiva só os aprovados + relatório
-- [ ] **T5.6** `GET /api/importacoes/{id}` → status/relatório
-- [ ] **T5.7** Persistir `importacao` + `importacao_item` (rastreabilidade da origem)
-- [ ] **T5.8** Tela de upload de planilha
-- [ ] **T5.9** Tela de pré-visualização (linha, RM, nome, situação; seleção dos válidos)
-- [ ] **T5.10** Tela de resultado/relatório da importação
-- [ ] **T5.11** Integração fim-a-fim front ↔ API
-- [ ] **T5.12** Importar amostra controlada da planilha real
+- [x] **T5.1** `LeitorPlanilhaPort` + adaptador Apache POI (.xlsx) — reconhece colunas Nome + RM
+- [x] **T5.2** Normalização de registros (`RegistroExtraido` comum ao pipeline — ADR-0003)
+- [x] **T5.3** `ValidadorRegistro`: VALIDO, INVALIDO (RM/nome ausente), DUPLICADO, CONFLITO (RM igual, nome diferente)
+- [x] **T5.4** `POST /api/importacoes/planilha/validar` → retorna resumo + itens (NÃO grava)
+- [x] **T5.5** `POST /api/importacoes/planilha/confirmar` → efetiva só os aprovados + relatório
+- [x] **T5.6** `GET /api/importacoes/{id}` → status/relatório
+- [x] **T5.7** Persistir `importacao` + `importacao_item` (rastreabilidade da origem) — Flyway V3
+- [x] **T5.8** Tela de upload de planilha
+- [x] **T5.9** Tela de pré-visualização (linha, RM, nome, situação; seleção dos válidos)
+- [x] **T5.10** Tela de resultado/relatório da importação
+- [x] **T5.11** Integração fim-a-fim front ↔ API
+- [ ] **T5.12** Importar amostra controlada da planilha real (com a secretaria)
 
 ## Épico 6 — Exportação e backup
 - [ ] **T6.1** API exportação dos registros (.xlsx/.csv)

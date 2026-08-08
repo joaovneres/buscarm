@@ -36,6 +36,16 @@ mvn spring-boot:run
 
 Paginação: `?pagina=0&tamanho=20` (ordena por sobrenome).
 
+### Importação por planilha (Épico 5)
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| `POST` | `/api/importacoes/planilha/validar` | Upload `.xlsx` (multipart `arquivo`) → pré-visualização classificada (**não grava**) |
+| `POST` | `/api/importacoes/planilha/confirmar` | `{importacaoId, linhasAprovadas[]}` → grava só os válidos aprovados + relatório |
+| `GET` | `/api/importacoes/{id}` | Status/relatório da importação |
+
+Cada linha é classificada em `VALIDO`/`INVALIDO`/`DUPLICADO`/`CONFLITO`; a gravação reusa o
+cadastro (`CadastrarRegistroUseCase`) e tudo fica rastreado em `importacao`/`importacao_item`.
+
 ## Estrutura (Arquitetura Hexagonal — ADR-0007)
 ```
 com.buscarm
