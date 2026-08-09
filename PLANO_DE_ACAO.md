@@ -89,7 +89,7 @@ Marque `[x]` ao concluir. Divisão de responsáveis será definida mais adiante.
 - [x] **T4.5** API busca por RM `GET /api/registros?rm=`
 - [x] **T4.6** Paginação e ordenação por sobrenome
 - [x] **T4.7** Tela de pesquisa (input nome/RM, resultados, destaque do RM)
-- [~] **T4.8** Form de edição na UI (edição pronta; form de cadastro manual ainda pendente)
+- [x] **T4.8** Form de cadastro manual e edição na UI
 - [x] **T4.9** Ação de desativar registro na UI (com confirmação)
 
 ## Épico 5 — Importação por Excel *[coração do MVP]*
