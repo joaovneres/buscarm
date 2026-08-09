@@ -140,13 +140,13 @@ Marque `[x]` ao concluir. Divisão de responsáveis será definida mais adiante.
 - [ ] **T10.5** Cobertura mínima acordada e relatório
 
 ## Épico 11 — DevOps / CI/CD / Deploy
-- [ ] **T11.1** Dockerfile do backend
-- [ ] **T11.2** GitHub Actions: build + testes (back e front) em PR — ver [ADR-0005](./docs/adr/0005-ci-cd.md)
-- [ ] **T11.3** Versionamento (SemVer + tags) e geração de releases
-- [ ] **T11.4** Deploy backend no Render (Docker) + variáveis
-- [ ] **T11.5** Deploy frontend no Vercel + variáveis
-- [ ] **T11.6** Banco Neon em produção + rodar migrations Flyway
-- [ ] **T11.7** Smoke test em produção
+- [x] **T11.1** Dockerfile do backend
+- [x] **T11.2** GitHub Actions: build + testes (back e front) em PR — ver [ADR-0005](./docs/adr/0005-ci-cd.md)
+- [x] **T11.3** Versionamento (SemVer + tags) e geração de releases (release.yml + deploy.yml)
+- [~] **T11.4** Deploy backend no Render — pronto: [`render.yaml`](./render.yaml) + config por env + runbook [`docs/deploy.md`](./docs/deploy.md). Falta o dono provisionar a conta/segredos.
+- [~] **T11.5** Deploy frontend no Vercel — runbook pronto em [`docs/deploy.md`](./docs/deploy.md). Falta provisionar.
+- [~] **T11.6** Banco Neon + migrations Flyway — migrations `V1..V5` **validadas em Postgres 16** (inclusive o trigger). Falta apontar para o Neon real.
+- [ ] **T11.7** Smoke test em produção (script em [`docs/deploy.md`](./docs/deploy.md#6-smoke-test-em-produção-t117))
 
 ## Épico 12 — Validação com a comunidade e entregas acadêmicas
 - [ ] **T12.1** Apresentar 1ª versão à secretaria (feedback)
