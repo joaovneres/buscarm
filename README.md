@@ -42,3 +42,10 @@ Veja o [PLANO_DE_ACAO.md](./PLANO_DE_ACAO.md) para o passo a passo dividido em t
 
 Instruções de execução do backend e frontend serão adicionadas em `backend/README.md` e
 `frontend/README.md` conforme a implementação avança (Épicos 2 e 4).
+
+## Deploy
+
+- **Runbook passo a passo:** [`docs/deploy.md`](./docs/deploy.md) — Neon → Render → Vercel,
+  com deploy manual versionado (ADR-0005).
+- **Segredos e onde moram:** [`docs/CONFIGURACAO_NUVEM.md`](./docs/CONFIGURACAO_NUVEM.md).
+- **Blueprint do backend:** [`render.yaml`](./render.yaml).

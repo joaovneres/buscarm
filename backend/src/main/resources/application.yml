@@ -23,6 +23,16 @@ buscarm:
   cors:
     # Origens permitidas do frontend, separadas por vírgula.
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
+  jwt:
+    # Em produção, defina JWT_SECRET (>= 32 bytes). O default é só para desenvolvimento.
+    secret: ${JWT_SECRET:troque-este-segredo-de-desenvolvimento-buscarm-32bytes+}
+    expiration-minutes: ${JWT_EXPIRATION_MINUTES:480}
+  admin:
+    # Usuário ADMIN inicial (criado só se o banco não tiver nenhum usuário).
+    # Em produção, defina ADMIN_EMAIL e ADMIN_PASSWORD; não use o default.
+    nome: ${ADMIN_NOME:Administrador}
+    email: ${ADMIN_EMAIL:admin@buscarm.local}
+    senha: ${ADMIN_PASSWORD:admin12345}
 
 springdoc:
   swagger-ui:

@@ -1,0 +1,38 @@
+# Blueprint do Render para o backend do BuscaRM (T11.4).
+# Alinhado ao ADR-0005: o serviço roda a IMAGEM versionada publicada no GHCR pelo release.yml;
+# o deploy é MANUAL (workflow deploy.yml dispara o Deploy Hook do Render passando ?imgURL=...).
+#
+# Como usar: New > Blueprint no Render, aponte para este repositório. Depois preencha os valores
+# marcados como sync:false em Environment (segredos) — ver docs/deploy.md.
+services:
+  - type: web
+    name: buscarm-backend
+    runtime: image
+    plan: free
+    region: oregon
+    image:
+      # Imagem publicada por release.yml ao criar uma tag vX.Y.Z. O deploy manual troca a tag.
+      url: ghcr.io/joaovneres/buscarm-backend:latest
+    autoDeploy: false            # deploy é manual (deploy.yml), não a cada push
+    healthCheckPath: /actuator/health
+    envVars:
+      # Banco Neon (Postgres). A URL JDBC vai sem usuário/senha; estes vão separados.
+      - key: DATABASE_URL        # ex.: jdbc:postgresql://<host>.neon.tech/buscarm?sslmode=require
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      # Segurança: Render gera um segredo forte para o JWT (>= 32 bytes).
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION_MINUTES
+        value: "480"
+      # Origem do frontend na Vercel (para o CORS). ex.: https://buscarm.vercel.app
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      # Admin inicial (criado só se o banco estiver sem usuários). NÃO use o default em produção.
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
