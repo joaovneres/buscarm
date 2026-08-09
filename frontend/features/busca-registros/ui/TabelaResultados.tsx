@@ -66,7 +66,7 @@ export function TabelaResultados({
                 <button type="button" onClick={() => onIniciarEdicao(r.id)}>
                   Editar
                 </button>
-                <button type="button" onClick={() => onDesativar(r)}>
+                <button type="button" className="btn-danger" onClick={() => onDesativar(r)}>
                   Desativar
                 </button>
               </td>
