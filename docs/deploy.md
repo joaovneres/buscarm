@@ -100,7 +100,9 @@ gh secret set RENDER_DEPLOY_HOOK_URL --repo joaovneres/buscarm
 ## 3. Frontend — Vercel (Next.js)
 
 1. Vercel → **Add New → Project** → importe `joaovneres/buscarm`.
-2. **Root Directory = `frontend`** (importante — o Next fica em subpasta). Framework: Next.js (auto).
+2. **Root Directory = `frontend`** (importante — o Next fica em subpasta). O framework é fixado
+   como Next.js pelo [`frontend/vercel.json`](../frontend/vercel.json) (sem ele, o Vercel pode não
+   autodetectar e falhar com _"No Output Directory named 'public'"_).
 3. Variável de ambiente:
    | Variável | Valor |
    | --- | --- |
