@@ -2,7 +2,11 @@
 
 import { useState, type FormEvent } from 'react';
 
+import type { AlteracaoRegistro } from '@/entities/registro/api/alterarRegistro';
+import type { RegistroResponse } from '@/entities/registro/model/types';
+
 import { useBuscaRegistros } from '../model/useBuscaRegistros';
+import { useGerenciarRegistros } from '../model/useGerenciarRegistros';
 import { TabelaResultados } from './TabelaResultados';
 
 type TipoBusca = 'nome' | 'rm';
@@ -10,7 +14,9 @@ type TipoBusca = 'nome' | 'rm';
 export function BuscaRegistros() {
   const [tipo, setTipo] = useState<TipoBusca>('nome');
   const [termo, setTermo] = useState('');
-  const { estado, resultados, erro, buscar } = useBuscaRegistros();
+  const [editandoId, setEditandoId] = useState<number | null>(null);
+  const { estado, resultados, erro, buscar, recarregar } = useBuscaRegistros();
+  const { enviando, erro: erroAcao, alterar, desativar } = useGerenciarRegistros();
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -18,7 +24,29 @@ export function BuscaRegistros() {
     if (!valor) {
       return;
     }
+    setEditandoId(null);
     buscar(tipo === 'nome' ? { nome: valor } : { rm: valor });
+  }
+
+  async function onSalvar(id: number, dados: AlteracaoRegistro) {
+    const ok = await alterar(id, dados);
+    if (ok) {
+      setEditandoId(null);
+      await recarregar();
+    }
+  }
+
+  async function onDesativar(registro: RegistroResponse) {
+    const confirmado = window.confirm(
+      `Desativar o registro de RM ${registro.rm} (${registro.nomeCompleto})?`,
+    );
+    if (!confirmado) {
+      return;
+    }
+    const ok = await desativar(registro.id);
+    if (ok) {
+      await recarregar();
+    }
   }
 
   return (
@@ -61,7 +89,18 @@ export function BuscaRegistros() {
 
       {estado === 'loading' && <p role="status">Buscando…</p>}
       {estado === 'erro' && <p role="alert">{erro}</p>}
-      {estado === 'sucesso' && <TabelaResultados registros={resultados} />}
+      {estado === 'sucesso' && (
+        <TabelaResultados
+          registros={resultados}
+          editandoId={editandoId}
+          enviando={enviando}
+          erroAcao={erroAcao}
+          onIniciarEdicao={setEditandoId}
+          onCancelarEdicao={() => setEditandoId(null)}
+          onSalvar={onSalvar}
+          onDesativar={onDesativar}
+        />
+      )}
     </section>
   );
 }

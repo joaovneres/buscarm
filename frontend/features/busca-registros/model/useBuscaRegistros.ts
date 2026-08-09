@@ -12,8 +12,10 @@ export function useBuscaRegistros() {
   const [estado, setEstado] = useState<EstadoBusca>('idle');
   const [resultados, setResultados] = useState<RegistroResponse[]>([]);
   const [erro, setErro] = useState<string | null>(null);
+  const [ultimaBusca, setUltimaBusca] = useState<{ nome?: string; rm?: string } | null>(null);
 
   async function buscar(params: { nome?: string; rm?: string }) {
+    setUltimaBusca(params);
     setEstado('loading');
     setErro(null);
     try {
@@ -27,5 +29,12 @@ export function useBuscaRegistros() {
     }
   }
 
-  return { estado, resultados, erro, buscar };
+  /** Repete a última busca (para atualizar a lista após alterar/desativar um registro). */
+  async function recarregar() {
+    if (ultimaBusca) {
+      await buscar(ultimaBusca);
+    }
+  }
+
+  return { estado, resultados, erro, buscar, recarregar };
 }

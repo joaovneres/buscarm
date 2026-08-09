@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.buscarm.registro.application.port.out.RegistroRepositoryPort;
 import com.buscarm.registro.domain.Registro;
+import com.buscarm.registro.domain.exception.RegistroNaoEncontradoException;
 import com.buscarm.shared.Pagina;
 
 /** Adaptador de saída que implementa a porta de persistência usando Spring Data JPA. */
@@ -32,6 +33,19 @@ public class RegistroPersistenceAdapter implements RegistroRepositoryPort {
     public Registro salvar(Registro registro) {
         RegistroJpaEntity salvo = repository.save(RegistroPersistenceMapper.paraNovaEntidade(registro));
         return RegistroPersistenceMapper.paraDominio(salvo);
+    }
+
+    @Override
+    public Registro atualizar(Registro registro) {
+        RegistroJpaEntity e = repository.findById(registro.getId())
+                .orElseThrow(() -> new RegistroNaoEncontradoException(registro.getId()));
+        e.setRm(registro.getRm());
+        e.setNomeCompleto(registro.getNomeCompleto());
+        e.setSobrenome(registro.getSobrenome());
+        e.setNomeBusca(registro.getNomeBusca());
+        e.setAnoRegistro(registro.getAnoRegistro());
+        e.setAtivo(registro.isAtivo());
+        return RegistroPersistenceMapper.paraDominio(repository.save(e));
     }
 
     @Override

@@ -39,6 +39,9 @@ tests/                                 # unit (Vitest) + e2e (Playwright)
 Fluxo de importação (`/importacao/planilha`): upload `.xlsx` → **pré-visualização** classificada
 (seleção só dos válidos) → **confirmação** → relatório. Nada grava sem confirmação humana.
 
-## Fluxo atual (Épico 4 — parcial)
+## Fluxo atual (Épico 4)
 Tela `/registros`: busca por **nome** (parcial, acento-insensível) ou por **RM**, com destaque do
-RM nos resultados e estados de loading/erro acessíveis. Consome `GET /api/registros` do backend.
+RM nos resultados e estados de loading/erro acessíveis. Cada resultado tem ações **Editar**
+(formulário inline: RM, nome e ano — `PUT /api/registros/{id}`) e **Desativar** (com confirmação —
+`DELETE /api/registros/{id}`, exclusão lógica). Após alterar/desativar, a lista é recarregada com a
+última busca. Consome `GET/PUT/DELETE /api/registros` do backend.

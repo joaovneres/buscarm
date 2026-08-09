@@ -59,6 +59,19 @@ public final class Registro {
                 criadoPor, atualizadoPor, criadoEm);
     }
 
+    /** Cópia com RM/nome/ano alterados; re-deriva sobrenome e chave de busca. Preserva autoria e ativo. */
+    public Registro comDados(int rm, String nomeCompleto, Integer anoRegistro) {
+        String nome = nomeCompleto == null ? "" : nomeCompleto.trim();
+        return new Registro(id, rm, nome, NomeNormalizer.extrairSobrenome(nome),
+                NomeNormalizer.normalizar(nome), anoRegistro, ativo, criadoPor, atualizadoPor, criadoEm);
+    }
+
+    /** Cópia inativa (desativação lógica — o prontuário físico continua existindo). */
+    public Registro desativado() {
+        return new Registro(id, rm, nomeCompleto, sobrenome, nomeBusca, anoRegistro, false,
+                criadoPor, atualizadoPor, criadoEm);
+    }
+
     public Long getId() {
         return id;
     }

@@ -82,15 +82,15 @@ Marque `[x]` ao concluir. Divisão de responsáveis será definida mais adiante.
 - Frontend: tela `/login`, `AuthProvider`/`useAuth`, `RequireAuth` (rotas protegidas), token no `shared/api/client`
 
 ## Épico 4 — Cadastro manual e pesquisa
-- [ ] **T4.1** API cadastro manual `POST /api/registros`
-- [ ] **T4.2** API alteração `PUT /api/registros/{id}` (com auditoria)
-- [ ] **T4.3** API desativação `PATCH` (soft delete, `ativo=false`)
-- [ ] **T4.4** API busca por nome `GET /api/registros?nome=` (parcial, normalizada, acento-insensível)
-- [ ] **T4.5** API busca por RM `GET /api/registros?rm=`
-- [ ] **T4.6** Paginação e ordenação por sobrenome
-- [ ] **T4.7** Tela de pesquisa (input nome/RM, resultados, destaque do RM)
-- [ ] **T4.8** Tela/form de cadastro manual e edição
-- [ ] **T4.9** Ação de desativar registro na UI
+- [x] **T4.1** API cadastro manual `POST /api/registros`
+- [x] **T4.2** API alteração `PUT /api/registros/{id}` (com auditoria `ALTERAR`)
+- [x] **T4.3** API desativação `DELETE /api/registros/{id}` (soft delete `ativo=false`, auditoria `DESATIVAR`)
+- [x] **T4.4** API busca por nome `GET /api/registros?nome=` (parcial, normalizada, acento-insensível)
+- [x] **T4.5** API busca por RM `GET /api/registros?rm=`
+- [x] **T4.6** Paginação e ordenação por sobrenome
+- [x] **T4.7** Tela de pesquisa (input nome/RM, resultados, destaque do RM)
+- [~] **T4.8** Form de edição na UI (edição pronta; form de cadastro manual ainda pendente)
+- [x] **T4.9** Ação de desativar registro na UI (com confirmação)
 
 ## Épico 5 — Importação por Excel *[coração do MVP]*
 - [x] **T5.1** `LeitorPlanilhaPort` + adaptador Apache POI (.xlsx) — reconhece colunas Nome + RM
