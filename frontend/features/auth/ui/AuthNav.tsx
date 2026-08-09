@@ -16,20 +16,33 @@ export function AuthNav() {
   }
 
   if (!autenticado || !usuario) {
-    return <Link href="/login">Entrar</Link>;
+    return (
+      <header className="appbar">
+        <Link href="/" className="appbar__brand">
+          BuscaRM
+        </Link>
+        <div className="appbar__right">
+          <Link href="/login">Entrar</Link>
+        </div>
+      </header>
+    );
   }
 
   return (
-    <p>
-      {usuario.nome} ({usuario.papel}){' '}
-      {usuario.papel === 'ADMIN' && (
-        <>
-          <Link href="/auditoria">Auditoria</Link>{' '}
-        </>
-      )}
-      <button type="button" onClick={onSair}>
-        Sair
-      </button>
-    </p>
+    <header className="appbar">
+      <Link href="/registros" className="appbar__brand">
+        BuscaRM
+      </Link>
+      <div className="appbar__right">
+        <span className="appbar__user">
+          {usuario.nome}
+          <span className="appbar__role">{usuario.papel}</span>
+        </span>
+        {usuario.papel === 'ADMIN' && <Link href="/auditoria">Auditoria</Link>}
+        <button type="button" onClick={onSair}>
+          Sair
+        </button>
+      </div>
+    </header>
   );
 }
