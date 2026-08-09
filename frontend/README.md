@@ -26,7 +26,8 @@ Direção de dependência: `app → features → entities → shared`.
 ```
 app/                                   # rotas: /, /login, /registros, /importacao/planilha
 features/auth/{model,ui}/              # AuthProvider/useAuth, LoginForm, RequireAuth, AuthNav
-features/busca-registros/{ui,model}/   # BuscaRegistros, TabelaResultados + useBuscaRegistros
+features/busca-registros/{ui,model}/   # BuscaRegistros, TabelaResultados (editar/desativar)
+features/cadastrar-registro/{ui,model}/# CadastrarRegistro (form colapsável) + useCadastrarRegistro
 features/importar-planilha/{ui,model}/ # Upload, Preview, Relatório + useImportarPlanilha
 features/importar-imagem/{ui,model}/   # Upload foto, ConferenciaOcr (edição) + useImportarImagem
 features/exportar-registros/ui/        # ExportarRegistros (download .xlsx/.csv)
@@ -40,7 +41,8 @@ Fluxo de importação (`/importacao/planilha`): upload `.xlsx` → **pré-visual
 (seleção só dos válidos) → **confirmação** → relatório. Nada grava sem confirmação humana.
 
 ## Fluxo atual (Épico 4)
-Tela `/registros`: busca por **nome** (parcial, acento-insensível) ou por **RM**, com destaque do
+Tela `/registros`: **+ Novo registro** (form colapsável de cadastro manual — `POST /api/registros`)
+e busca por **nome** (parcial, acento-insensível) ou por **RM**, com destaque do
 RM nos resultados e estados de loading/erro acessíveis. Cada resultado tem ações **Editar**
 (formulário inline: RM, nome e ano — `PUT /api/registros/{id}`) e **Desativar** (com confirmação —
 `DELETE /api/registros/{id}`, exclusão lógica). Após alterar/desativar, a lista é recarregada com a
