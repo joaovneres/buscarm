@@ -1,9 +1,13 @@
 package com.buscarm.registro;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -90,5 +94,71 @@ class RegistroIntegrationTest {
                         .content("{\"nomeCompleto\":\"\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDACAO"));
+    }
+
+    @Test
+    void alteraNomeEAnoDoRegistro() throws Exception {
+        long id = criar(new RegistroRequest(700, "Silva, Ana", null));
+
+        var alteracao = new RegistroRequest(700, "Silva, Ana Paula", 2019);
+        mvc.perform(put("/api/registros/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(alteracao)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nomeCompleto").value("Silva, Ana Paula"))
+                .andExpect(jsonPath("$.anoRegistro").value(2019))
+                .andExpect(jsonPath("$.atualizadoPor").value("secretaria"));
+
+        // a busca por nome reflete a alteração (chave de busca re-derivada)
+        mvc.perform(get("/api/registros").param("nome", "ana paula"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(1))
+                .andExpect(jsonPath("$.conteudo[0].rm").value(700));
+    }
+
+    @Test
+    void alterarParaRmJaUsadoRetorna409() throws Exception {
+        criar(new RegistroRequest(710, "Souza, Bruno", null));
+        long id = criar(new RegistroRequest(711, "Souza, Bruna", null));
+
+        var alteracao = new RegistroRequest(710, "Souza, Bruna", null);
+        mvc.perform(put("/api/registros/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(alteracao)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("REGRA_NEGOCIO"));
+    }
+
+    @Test
+    void alterarRegistroInexistenteRetorna404() throws Exception {
+        var alteracao = new RegistroRequest(720, "Lima, Carlos", null);
+        mvc.perform(put("/api/registros/{id}", 999999)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(alteracao)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("NAO_ENCONTRADO"));
+    }
+
+    @Test
+    void desativaRegistroESaiDaBusca() throws Exception {
+        long id = criar(new RegistroRequest(730, "Alves, Diego", null));
+
+        mvc.perform(delete("/api/registros/{id}", id))
+                .andExpect(status().isNoContent());
+
+        // desativado não aparece mais na busca por RM (só ativos)
+        mvc.perform(get("/api/registros").param("rm", "730"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(0));
+    }
+
+    private long criar(RegistroRequest req) throws Exception {
+        String corpo = mvc.perform(post("/api/registros")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        JsonNode json = objectMapper.readTree(corpo);
+        return json.get("id").asLong();
     }
 }

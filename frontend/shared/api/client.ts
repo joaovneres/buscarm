@@ -65,6 +65,36 @@ export async function apiPost<T>(path: string, body: unknown): Promise<T> {
   return tratar<T>(res);
 }
 
+export async function apiPut<T>(path: string, body: unknown): Promise<T> {
+  const res = await fetch(urlApi(path), {
+    method: 'PUT',
+    headers: cabecalhos({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify(body),
+  });
+  return tratar<T>(res);
+}
+
+/** DELETE que não espera corpo de resposta (204 No Content). */
+export async function apiDelete(path: string): Promise<void> {
+  const res = await fetch(urlApi(path), { method: 'DELETE', headers: cabecalhos() });
+  if (!res.ok) {
+    if (res.status === 401) {
+      limparSessao();
+    }
+    let corpo: { code?: string; message?: string } | null = null;
+    try {
+      corpo = (await res.json()) as { code?: string; message?: string };
+    } catch {
+      corpo = null;
+    }
+    throw {
+      status: res.status,
+      code: corpo?.code ?? 'ERRO',
+      message: corpo?.message ?? 'Erro ao consultar a API',
+    } as ApiError;
+  }
+}
+
 export async function apiPostForm<T>(path: string, form: FormData): Promise<T> {
   const res = await fetch(urlApi(path), {
     method: 'POST',

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.buscarm.auditoria.application.port.in.RegistrarAuditoriaUseCase;
+import com.buscarm.registro.application.port.in.AlterarRegistroUseCase;
 import com.buscarm.registro.application.port.in.BuscarRegistrosUseCase;
 import com.buscarm.registro.application.port.in.CadastrarRegistroUseCase;
 import com.buscarm.registro.application.port.out.RegistroRepositoryPort;
@@ -22,7 +23,8 @@ import com.buscarm.shared.Pagina;
  * saída. Não conhece web nem JPA — só domínio e portas.
  */
 @Service
-public class RegistroApplicationService implements CadastrarRegistroUseCase, BuscarRegistrosUseCase {
+public class RegistroApplicationService
+        implements CadastrarRegistroUseCase, BuscarRegistrosUseCase, AlterarRegistroUseCase {
 
     private final RegistroRepositoryPort repositorio;
     private final UsuarioAtualPort usuarioAtual;
@@ -50,6 +52,29 @@ public class RegistroApplicationService implements CadastrarRegistroUseCase, Bus
                 Registro.novo(comando.rm(), comando.nomeCompleto(), comando.anoRegistro()));
         registrarAuditoria.registrar("CRIAR", "REGISTRO", salvo.getId(), "RM " + salvo.getRm());
         return salvo;
+    }
+
+    @Override
+    @Transactional
+    public Registro alterar(long id, AlterarRegistroCommand comando) {
+        usuarioSessao.definirUsuarioSessao(usuarioAtual.getUsuarioAtual());
+        Registro atual = buscarPorId(id);
+        if (comando.rm() != atual.getRm() && repositorio.existePorRm(comando.rm())) {
+            throw new RegistroDuplicadoException(comando.rm());
+        }
+        Registro alterado = repositorio.atualizar(
+                atual.comDados(comando.rm(), comando.nomeCompleto(), comando.anoRegistro()));
+        registrarAuditoria.registrar("ALTERAR", "REGISTRO", id, "RM " + alterado.getRm());
+        return alterado;
+    }
+
+    @Override
+    @Transactional
+    public void desativar(long id) {
+        usuarioSessao.definirUsuarioSessao(usuarioAtual.getUsuarioAtual());
+        Registro atual = buscarPorId(id);
+        repositorio.atualizar(atual.desativado());
+        registrarAuditoria.registrar("DESATIVAR", "REGISTRO", id, "RM " + atual.getRm());
     }
 
     @Override

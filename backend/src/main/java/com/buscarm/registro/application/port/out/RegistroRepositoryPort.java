@@ -13,6 +13,9 @@ public interface RegistroRepositoryPort {
 
     Registro salvar(Registro registro);
 
+    /** Atualiza um registro já existente (preserva autoria de criação; JPA registra quem alterou). */
+    Registro atualizar(Registro registro);
+
     /** Todos os registros ativos (para exportação/backup), ordenados por sobrenome. */
     List<Registro> listarTodosAtivos();
 
