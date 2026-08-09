@@ -103,10 +103,11 @@ gh secret set RENDER_DEPLOY_HOOK_URL --repo joaovneres/buscarm
 2. **Root Directory = `frontend`** (importante — o Next fica em subpasta). O framework é fixado
    como Next.js pelo [`frontend/vercel.json`](../frontend/vercel.json) (sem ele, o Vercel pode não
    autodetectar e falhar com _"No Output Directory named 'public'"_).
-3. Variável de ambiente:
-   | Variável | Valor |
-   | --- | --- |
-   | `NEXT_PUBLIC_API_URL` | URL do backend no Render (passo 2.3), ex.: `https://buscarm-backend.onrender.com` |
+3. Variável de ambiente `NEXT_PUBLIC_API_URL` (URL do backend no Render). **Já vem fixada** no
+   [`frontend/vercel.json`](../frontend/vercel.json) (`build.env`) como `https://buscarm.onrender.com`,
+   então o build do Vercel já aponta para o backend sem precisar mexer no painel. Se a URL do
+   backend mudar, atualize esse arquivo (a variável é inlinada no build; exige novo deploy).
+   Para sobrescrever pontualmente, defina `NEXT_PUBLIC_API_URL` nas Environment Variables do projeto.
 4. Deploy. Anote a URL, ex.: `https://buscarm.vercel.app`.
 5. **Deploy Hook do frontend:** Settings → Git → **Deploy Hooks** → crie um (branch `main`) → copie:
    ```bash
