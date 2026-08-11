@@ -16,9 +16,11 @@ public final class RegistroWebMapper {
                 r.getSobrenome(),
                 r.getAnoRegistro(),
                 r.isAtivo(),
+                r.getStatus().name(),
                 r.getCriadoPor(),
                 r.getAtualizadoPor(),
-                r.getCriadoEm()
+                r.getCriadoEm(),
+                r.getAtualizadoEm()
         );
     }
 }

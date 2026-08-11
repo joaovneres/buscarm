@@ -2,6 +2,7 @@ package com.buscarm.registro;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -46,6 +47,7 @@ class RegistroIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.rm").value(203))
                 .andExpect(jsonPath("$.sobrenome").value("Sousa"))
+                .andExpect(jsonPath("$.status").value("VALIDADO"))
                 .andExpect(jsonPath("$.criadoPor").value("secretaria"))
                 .andExpect(jsonPath("$.atualizadoPor").value("secretaria"));
 
@@ -150,6 +152,30 @@ class RegistroIntegrationTest {
         mvc.perform(get("/api/registros").param("rm", "730"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total").value(0));
+    }
+
+    @Test
+    void validarMarcaComoValidadoERetornaOk() throws Exception {
+        long id = criar(new RegistroRequest(740, "Prado, Igor", null));
+
+        mvc.perform(patch("/api/registros/{id}/validar", id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("VALIDADO"));
+    }
+
+    @Test
+    @WithMockUser(username = "leitor", roles = {"VISUALIZADOR"})
+    void visualizadorPodeBuscarMasNaoPodeEscrever() throws Exception {
+        // leitura permitida
+        mvc.perform(get("/api/registros"))
+                .andExpect(status().isOk());
+
+        // criação bloqueada (403)
+        var req = new RegistroRequest(760, "Teles, Ura", null);
+        mvc.perform(post("/api/registros")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isForbidden());
     }
 
     private long criar(RegistroRequest req) throws Exception {

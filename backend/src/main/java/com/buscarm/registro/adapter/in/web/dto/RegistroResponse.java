@@ -10,8 +10,10 @@ public record RegistroResponse(
         String sobrenome,
         Integer anoRegistro,
         boolean ativo,
+        String status,
         String criadoPor,
         String atualizadoPor,
-        Instant criadoEm
+        Instant criadoEm,
+        Instant atualizadoEm
 ) {
 }

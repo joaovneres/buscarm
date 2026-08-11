@@ -15,13 +15,15 @@ public final class Registro {
     private final String nomeBusca;
     private final Integer anoRegistro;
     private final boolean ativo;
+    private final StatusValidacao status;
     private final String criadoPor;
     private final String atualizadoPor;
     private final Instant criadoEm;
+    private final Instant atualizadoEm;
 
     private Registro(Long id, int rm, String nomeCompleto, String sobrenome, String nomeBusca,
-                     Integer anoRegistro, boolean ativo, String criadoPor, String atualizadoPor,
-                     Instant criadoEm) {
+                     Integer anoRegistro, boolean ativo, StatusValidacao status, String criadoPor,
+                     String atualizadoPor, Instant criadoEm, Instant atualizadoEm) {
         this.id = id;
         this.rm = rm;
         this.nomeCompleto = nomeCompleto;
@@ -29,13 +31,20 @@ public final class Registro {
         this.nomeBusca = nomeBusca;
         this.anoRegistro = anoRegistro;
         this.ativo = ativo;
+        this.status = status;
         this.criadoPor = criadoPor;
         this.atualizadoPor = atualizadoPor;
         this.criadoEm = criadoEm;
+        this.atualizadoEm = atualizadoEm;
     }
 
-    /** Cria um novo registro ainda não persistido; deriva sobrenome e chave de busca. */
+    /** Novo registro (cadastro manual): já nasce VALIDADO. */
     public static Registro novo(int rm, String nomeCompleto, Integer anoRegistro) {
+        return novo(rm, nomeCompleto, anoRegistro, StatusValidacao.VALIDADO);
+    }
+
+    /** Novo registro com status explícito (importação em lote nasce PENDENTE). */
+    public static Registro novo(int rm, String nomeCompleto, Integer anoRegistro, StatusValidacao status) {
         String nome = nomeCompleto == null ? "" : nomeCompleto.trim();
         return new Registro(
                 null,
@@ -45,6 +54,8 @@ public final class Registro {
                 NomeNormalizer.normalizar(nome),
                 anoRegistro,
                 true,
+                status == null ? StatusValidacao.VALIDADO : status,
+                null,
                 null,
                 null,
                 null
@@ -54,22 +65,30 @@ public final class Registro {
     /** Reconstitui um registro já existente (a partir da persistência). */
     public static Registro reconstituir(Long id, int rm, String nomeCompleto, String sobrenome,
                                         String nomeBusca, Integer anoRegistro, boolean ativo,
-                                        String criadoPor, String atualizadoPor, Instant criadoEm) {
-        return new Registro(id, rm, nomeCompleto, sobrenome, nomeBusca, anoRegistro, ativo,
-                criadoPor, atualizadoPor, criadoEm);
+                                        StatusValidacao status, String criadoPor, String atualizadoPor,
+                                        Instant criadoEm, Instant atualizadoEm) {
+        return new Registro(id, rm, nomeCompleto, sobrenome, nomeBusca, anoRegistro, ativo, status,
+                criadoPor, atualizadoPor, criadoEm, atualizadoEm);
     }
 
-    /** Cópia com RM/nome/ano alterados; re-deriva sobrenome e chave de busca. Preserva autoria e ativo. */
+    /** Cópia com RM/nome/ano alterados; re-deriva sobrenome e chave de busca. Preserva status/autoria. */
     public Registro comDados(int rm, String nomeCompleto, Integer anoRegistro) {
         String nome = nomeCompleto == null ? "" : nomeCompleto.trim();
         return new Registro(id, rm, nome, NomeNormalizer.extrairSobrenome(nome),
-                NomeNormalizer.normalizar(nome), anoRegistro, ativo, criadoPor, atualizadoPor, criadoEm);
+                NomeNormalizer.normalizar(nome), anoRegistro, ativo, status, criadoPor, atualizadoPor,
+                criadoEm, atualizadoEm);
     }
 
-    /** Cópia inativa (desativação lógica — o prontuário físico continua existindo). */
+    /** Cópia inativa (exclusão lógica — o prontuário físico continua existindo). */
     public Registro desativado() {
-        return new Registro(id, rm, nomeCompleto, sobrenome, nomeBusca, anoRegistro, false,
-                criadoPor, atualizadoPor, criadoEm);
+        return new Registro(id, rm, nomeCompleto, sobrenome, nomeBusca, anoRegistro, false, status,
+                criadoPor, atualizadoPor, criadoEm, atualizadoEm);
+    }
+
+    /** Cópia marcada como validada (conferência humana concluída). */
+    public Registro validado() {
+        return new Registro(id, rm, nomeCompleto, sobrenome, nomeBusca, anoRegistro, ativo,
+                StatusValidacao.VALIDADO, criadoPor, atualizadoPor, criadoEm, atualizadoEm);
     }
 
     public Long getId() {
@@ -100,6 +119,10 @@ public final class Registro {
         return ativo;
     }
 
+    public StatusValidacao getStatus() {
+        return status;
+    }
+
     public String getCriadoPor() {
         return criadoPor;
     }
@@ -110,5 +133,9 @@ public final class Registro {
 
     public Instant getCriadoEm() {
         return criadoEm;
+    }
+
+    public Instant getAtualizadoEm() {
+        return atualizadoEm;
     }
 }

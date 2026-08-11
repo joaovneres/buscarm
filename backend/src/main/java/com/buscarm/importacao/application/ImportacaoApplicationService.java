@@ -32,6 +32,7 @@ import com.buscarm.registro.application.port.in.CadastrarRegistroUseCase;
 import com.buscarm.registro.application.port.in.CadastrarRegistroUseCase.CadastrarRegistroCommand;
 import com.buscarm.registro.domain.NomeNormalizer;
 import com.buscarm.registro.domain.Registro;
+import com.buscarm.registro.domain.StatusValidacao;
 import com.buscarm.registro.domain.exception.RegistroDuplicadoException;
 
 /**
@@ -150,7 +151,7 @@ public class ImportacaoApplicationService implements ValidarPlanilhaUseCase, Con
     private void importar(ItemImportacao item, Integer rm, String nomeCompleto) {
         try {
             Registro registro = cadastrarRegistro.cadastrar(
-                    new CadastrarRegistroCommand(rm, nomeCompleto, null));
+                    new CadastrarRegistroCommand(rm, nomeCompleto, null, StatusValidacao.PENDENTE));
             item.marcarImportado(registro.getId());
         } catch (RegistroDuplicadoException e) {
             item.marcarIgnorado("RM já cadastrado");

@@ -9,6 +9,9 @@ public interface AlterarRegistroUseCase {
 
     void desativar(long id);
 
+    /** Marca o registro como validado (conclui a conferência de um item pendente). */
+    Registro validar(long id);
+
     /** Comando de alteração (independente do DTO web). */
     record AlterarRegistroCommand(int rm, String nomeCompleto, Integer anoRegistro) {
     }
