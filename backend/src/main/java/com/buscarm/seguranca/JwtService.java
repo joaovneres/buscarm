@@ -36,7 +36,7 @@ public class JwtService implements GeradorTokenPort {
     public String gerar(Usuario usuario) {
         Instant agora = Instant.now();
         return Jwts.builder()
-                .subject(usuario.getEmail())
+                .subject(usuario.getUsername())
                 .claim("papel", usuario.getPapel().name())
                 .claim("nome", usuario.getNome())
                 .issuedAt(Date.from(agora))
@@ -55,6 +55,6 @@ public class JwtService implements GeradorTokenPort {
         }
     }
 
-    public record Autenticado(String email, String papel) {
+    public record Autenticado(String username, String papel) {
     }
 }

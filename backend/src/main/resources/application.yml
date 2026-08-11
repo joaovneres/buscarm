@@ -29,9 +29,9 @@ buscarm:
     expiration-minutes: ${JWT_EXPIRATION_MINUTES:480}
   admin:
     # Usuário ADMIN inicial (criado só se o banco não tiver nenhum usuário).
-    # Em produção, defina ADMIN_EMAIL e ADMIN_PASSWORD; não use o default.
+    # Login por username (definido pelo admin). Em produção defina ADMIN_USERNAME e ADMIN_PASSWORD.
     nome: ${ADMIN_NOME:Administrador}
-    email: ${ADMIN_EMAIL:admin@buscarm.local}
+    username: ${ADMIN_USERNAME:admin}
     senha: ${ADMIN_PASSWORD:admin12345}
 
 springdoc:

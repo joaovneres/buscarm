@@ -4,7 +4,7 @@ test('a página de login carrega com o formulário acessível', async ({ page })
   await page.goto('/login');
 
   await expect(page.getByRole('heading', { name: /entrar no buscarm/i })).toBeVisible();
-  await expect(page.getByLabel('E-mail')).toBeVisible();
+  await expect(page.getByLabel('Usuário')).toBeVisible();
   await expect(page.getByRole('button', { name: /entrar/i })).toBeVisible();
 });
 

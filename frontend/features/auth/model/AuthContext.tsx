@@ -15,7 +15,7 @@ interface AuthContexto {
   usuario: UsuarioSessao | null;
   autenticado: boolean;
   carregando: boolean;
-  entrar: (email: string, senha: string) => Promise<void>;
+  entrar: (username: string, senha: string) => Promise<void>;
   sair: () => void;
 }
 
@@ -32,9 +32,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCarregando(false);
   }, []);
 
-  async function entrar(email: string, senha: string) {
-    const r = await apiLogin(email, senha);
-    const u: UsuarioSessao = { nome: r.nome, email: r.email, papel: r.papel };
+  async function entrar(username: string, senha: string) {
+    const r = await apiLogin(username, senha);
+    const u: UsuarioSessao = {
+      nome: r.nome,
+      username: r.username,
+      papel: r.papel,
+      senhaProvisoria: r.senhaProvisoria,
+    };
     salvarSessao(r.token, u);
     setUsuario(u);
   }

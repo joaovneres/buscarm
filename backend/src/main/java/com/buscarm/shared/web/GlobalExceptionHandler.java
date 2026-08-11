@@ -16,6 +16,8 @@ import com.buscarm.registro.domain.exception.RegistroDuplicadoException;
 import com.buscarm.registro.domain.exception.RegistroNaoEncontradoException;
 import com.buscarm.shared.ApiError;
 import com.buscarm.usuario.domain.exception.CredenciaisInvalidasException;
+import com.buscarm.usuario.domain.exception.UsernameJaCadastradoException;
+import com.buscarm.usuario.domain.exception.UsuarioNaoEncontradoException;
 
 /** Traduz exceções de domínio/validação em respostas {@link ApiError} consistentes. */
 @RestControllerAdvice
@@ -30,7 +32,8 @@ public class GlobalExceptionHandler {
         return construir(HttpStatus.BAD_REQUEST, "VALIDACAO", "Dados inválidos", req, campos);
     }
 
-    @ExceptionHandler({RegistroNaoEncontradoException.class, ImportacaoNaoEncontradaException.class})
+    @ExceptionHandler({RegistroNaoEncontradoException.class, ImportacaoNaoEncontradaException.class,
+            UsuarioNaoEncontradoException.class})
     public ResponseEntity<ApiError> handleNaoEncontrado(RuntimeException ex,
                                                         HttpServletRequest req) {
         return construir(HttpStatus.NOT_FOUND, "NAO_ENCONTRADO", ex.getMessage(), req, List.of());
@@ -48,8 +51,8 @@ public class GlobalExceptionHandler {
         return construir(HttpStatus.UNAUTHORIZED, "CREDENCIAIS_INVALIDAS", ex.getMessage(), req, List.of());
     }
 
-    @ExceptionHandler(RegistroDuplicadoException.class)
-    public ResponseEntity<ApiError> handleDuplicado(RegistroDuplicadoException ex,
+    @ExceptionHandler({RegistroDuplicadoException.class, UsernameJaCadastradoException.class})
+    public ResponseEntity<ApiError> handleDuplicado(RuntimeException ex,
                                                     HttpServletRequest req) {
         return construir(HttpStatus.CONFLICT, "REGRA_NEGOCIO", ex.getMessage(), req, List.of());
     }

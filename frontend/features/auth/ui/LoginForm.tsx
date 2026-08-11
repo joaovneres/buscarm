@@ -8,7 +8,7 @@ import { useAuth } from '../model/AuthContext';
 export function LoginForm() {
   const { entrar } = useAuth();
   const router = useRouter();
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [senha, setSenha] = useState('');
   const [erro, setErro] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
@@ -18,7 +18,7 @@ export function LoginForm() {
     setEnviando(true);
     setErro(null);
     try {
-      await entrar(email.trim(), senha);
+      await entrar(username.trim(), senha);
       router.push('/registros');
     } catch (err) {
       setErro((err as { message?: string })?.message ?? 'Não foi possível entrar');
@@ -28,14 +28,14 @@ export function LoginForm() {
 
   return (
     <form onSubmit={onSubmit} aria-label="Entrar">
-      <label htmlFor="email">E-mail</label>
+      <label htmlFor="username">Usuário</label>
       <input
-        id="email"
-        name="email"
-        type="email"
+        id="username"
+        name="username"
+        type="text"
         autoComplete="username"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
         required
       />
 

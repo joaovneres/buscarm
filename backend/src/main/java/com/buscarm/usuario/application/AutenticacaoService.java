@@ -27,14 +27,14 @@ public class AutenticacaoService implements AutenticarUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public ResultadoLogin autenticar(String email, String senha) {
-        Usuario usuario = repositorio.buscarPorEmail(email == null ? "" : email.trim().toLowerCase())
+    public ResultadoLogin autenticar(String username, String senha) {
+        Usuario usuario = repositorio.buscarPorUsername(username == null ? "" : username.trim().toLowerCase())
                 .filter(Usuario::isAtivo)
                 .orElseThrow(CredenciaisInvalidasException::new);
         if (!codificador.confere(senha, usuario.getSenhaHash())) {
             throw new CredenciaisInvalidasException();
         }
         return new ResultadoLogin(gerador.gerar(usuario), usuario.getNome(),
-                usuario.getEmail(), usuario.getPapel().name());
+                usuario.getUsername(), usuario.getPapel().name(), usuario.isSenhaProvisoria());
     }
 }
