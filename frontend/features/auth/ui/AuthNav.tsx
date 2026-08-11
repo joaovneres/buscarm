@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { rotuloPapel } from '@/shared/auth/roles';
+import { BotaoTema } from '@/features/tema/ui/BotaoTema';
 
 import { useAuth } from '../model/AuthContext';
 
@@ -24,6 +25,7 @@ export function AuthNav() {
           BuscaRM
         </Link>
         <div className="appbar__right">
+          <BotaoTema />
           <Link href="/login">Entrar</Link>
         </div>
       </header>
@@ -44,6 +46,7 @@ export function AuthNav() {
         {usuario.papel === 'ADMIN' && <Link href="/usuarios">Usuários</Link>}
         {usuario.papel === 'ADMIN' && <Link href="/auditoria">Auditoria</Link>}
         <Link href="/trocar-senha">Trocar senha</Link>
+        <BotaoTema />
         <button type="button" onClick={onSair}>
           Sair
         </button>

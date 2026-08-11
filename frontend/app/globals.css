@@ -5,32 +5,35 @@
    responsivo (mobile-first). Acessível (foco visível, contraste, motion).
    ========================================================================== */
 
+/* Paleta inspirada na identidade institucional da SEDUC-SP / Governo de São Paulo:
+   azul institucional dominante sobre superfícies claras. Tema CLARO por padrão;
+   o modo escuro é ativado manualmente (data-theme="dark"). */
 :root {
-  --bg: #eef1f6;
-  --bg-grad: radial-gradient(1200px 600px at 100% -10%, #dfe7f7 0%, transparent 60%),
-             radial-gradient(1000px 500px at -10% 0%, #e6f0ea 0%, transparent 55%);
+  --bg: #eef2f8;
+  --bg-grad: radial-gradient(1200px 600px at 100% -10%, #dbe6fa 0%, transparent 60%),
+             radial-gradient(1000px 500px at -10% 0%, #e4ecf7 0%, transparent 55%);
   --surface: #ffffff;
-  --surface-2: #f4f6fa;
-  --text: #182031;
-  --text-muted: #5a6472;
-  --border: #e0e5ee;
-  --border-strong: #cbd3df;
+  --surface-2: #f3f6fb;
+  --text: #14203a;
+  --text-muted: #566080;
+  --border: #dfe5f0;
+  --border-strong: #c6cfe0;
 
-  --primary: #1b5fd0;
-  --primary-hover: #1750ac;
+  --primary: #0f47a1;
+  --primary-hover: #0c3a84;
   --primary-contrast: #ffffff;
-  --primary-soft: #e8f0fd;
+  --primary-soft: #e6eefb;
 
-  --danger: #c33223;
-  --danger-hover: #a5291c;
-  --danger-soft: #fdecea;
-  --success: #147a4e;
-  --success-soft: #e6f5ee;
-  --warning-soft: #fdf3e3;
+  --danger: #c0392b;
+  --danger-hover: #9e2c20;
+  --danger-soft: #fbecea;
+  --success: #1a7a4f;
+  --success-soft: #e6f4ec;
+  --warning-soft: #fdf3e0;
 
-  --ring: rgba(27, 95, 208, 0.45);
-  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.08);
-  --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.08), 0 2px 4px rgba(16, 24, 40, 0.05);
+  --ring: rgba(15, 71, 161, 0.4);
+  --shadow-sm: 0 1px 2px rgba(15, 32, 71, 0.06), 0 1px 3px rgba(15, 32, 71, 0.08);
+  --shadow-md: 0 4px 12px rgba(15, 32, 71, 0.1), 0 2px 4px rgba(15, 32, 71, 0.06);
 
   --radius: 12px;
   --radius-sm: 8px;
@@ -38,34 +41,32 @@
   --space: 1rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0e1320;
-    --bg-grad: radial-gradient(1200px 600px at 100% -10%, #13223f 0%, transparent 60%),
-               radial-gradient(1000px 500px at -10% 0%, #10241b 0%, transparent 55%);
-    --surface: #161d2c;
-    --surface-2: #1d2536;
-    --text: #e8ecf3;
-    --text-muted: #9aa4b3;
-    --border: #29313f;
-    --border-strong: #3a4453;
+:root[data-theme='dark'] {
+  --bg: #0b1220;
+  --bg-grad: radial-gradient(1200px 600px at 100% -10%, #12233f 0%, transparent 60%),
+             radial-gradient(1000px 500px at -10% 0%, #101a2e 0%, transparent 55%);
+  --surface: #141c2b;
+  --surface-2: #1b2436;
+  --text: #e8ecf3;
+  --text-muted: #99a4b5;
+  --border: #28313f;
+  --border-strong: #3a4453;
 
-    --primary: #5b93f2;
-    --primary-hover: #74a4f5;
-    --primary-contrast: #0b1220;
-    --primary-soft: #1a2941;
+  --primary: #5e9bf6;
+  --primary-hover: #79acf8;
+  --primary-contrast: #0a1122;
+  --primary-soft: #182a45;
 
-    --danger: #ef6f60;
-    --danger-hover: #f2857a;
-    --danger-soft: #35201d;
-    --success: #4ac68e;
-    --success-soft: #16281f;
-    --warning-soft: #2c2517;
+  --danger: #ef6f60;
+  --danger-hover: #f2857a;
+  --danger-soft: #35201d;
+  --success: #4ac68e;
+  --success-soft: #16281f;
+  --warning-soft: #2c2517;
 
-    --ring: rgba(91, 147, 242, 0.5);
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.35);
-  }
+  --ring: rgba(94, 155, 246, 0.5);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.35);
 }
 
 * {
@@ -677,6 +678,11 @@ nav[aria-label='Ações'] a:hover {
   margin: -0.15rem 0 0.5rem;
 }
 
+.login-topo {
+  display: flex;
+  justify-content: flex-end;
+}
+
 /* Divisória alfabética (assinatura do índice físico) */
 .divisoria td {
   background: var(--surface-2);
@@ -769,10 +775,8 @@ nav[aria-label='Ações'] a:hover {
   background: #d9930a;
 }
 
-@media (prefers-color-scheme: dark) {
-  .selo--pendente {
-    color: #e9b465;
-  }
+:root[data-theme='dark'] .selo--pendente {
+  color: #e9b465;
 }
 
 /* ---- Paginação ---- */
