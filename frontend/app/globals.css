@@ -520,6 +520,377 @@ nav[aria-label='Ações'] a:hover {
   border-radius: 4px;
 }
 
+/* ==========================================================================
+   Listagem de registros (índice Nome→RM)
+   ========================================================================== */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.lista__topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.lista__topo button,
+.lista__topo section {
+  margin: 0;
+}
+
+/* Exportar (dentro do topo) fica compacto, sem cara de cartão */
+.lista__topo section {
+  padding: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.lista__topo section h2 {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0 0.25rem 0 0;
+  font-weight: 600;
+}
+
+.lista__topo section p {
+  display: none;
+}
+
+/* ---- Barra de busca + filtros ---- */
+.barra-busca {
+  gap: 0.75rem;
+}
+
+.barra-busca__linha {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.6rem;
+}
+
+.campo-busca {
+  flex: 1;
+}
+
+.campo-busca label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.barra-busca__linha button {
+  margin: 0;
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.filtro {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin: 0;
+}
+
+.filtro > span {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.filtro select,
+.filtro input {
+  margin: 0;
+  min-width: 8rem;
+}
+
+.filtros button {
+  margin: 0;
+}
+
+/* ---- Tabela ---- */
+.tabela-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.tabela-registros {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  margin: 0;
+  min-width: 520px;
+}
+
+.tabela-registros thead th {
+  position: sticky;
+  top: 0;
+}
+
+/* RM como "número de catálogo" — tabular, destacado */
+.rm {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--primary);
+}
+
+.col-nome {
+  font-weight: 550;
+}
+
+/* Divisória alfabética (assinatura do índice físico) */
+.divisoria td {
+  background: var(--surface-2);
+  padding: 0.3rem 0.8rem;
+  font-size: 0.82rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  color: var(--primary);
+  border-bottom: 1px solid var(--border);
+}
+
+.col-acoes {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.acoes {
+  display: inline-flex;
+  gap: 0.25rem;
+  justify-content: flex-end;
+}
+
+.icone-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  margin: 0;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+}
+
+.icone-btn:hover {
+  color: var(--primary);
+  background: var(--primary-soft);
+  box-shadow: none;
+}
+
+.icone-btn--perigo:hover {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.vazio {
+  color: var(--text-muted);
+  padding: 1.5rem;
+  text-align: center;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+}
+
+/* ---- Selo de status ---- */
+.selo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.15rem 0.6rem 0.15rem 0.45rem;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.selo__ponto {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  flex: none;
+}
+
+.selo--ok {
+  color: var(--success);
+  background: var(--success-soft);
+}
+
+.selo--ok .selo__ponto {
+  background: var(--success);
+}
+
+.selo--pendente {
+  color: #9a6a12;
+  background: var(--warning-soft);
+}
+
+.selo--pendente .selo__ponto {
+  background: #d9930a;
+}
+
+@media (prefers-color-scheme: dark) {
+  .selo--pendente {
+    color: #e9b465;
+  }
+}
+
+/* ---- Paginação ---- */
+.paginacao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.paginacao__info {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* ---- Botões utilitários ---- */
+.btn-secundario {
+  --btn-bg: var(--surface-2);
+  --btn-fg: var(--text);
+  --btn-bd: var(--border-strong);
+}
+
+.btn-perigo {
+  --btn-bg: var(--danger);
+  --btn-fg: #fff;
+  --btn-bd: transparent;
+}
+
+.btn-perigo:hover {
+  --btn-bg: var(--danger-hover);
+  filter: none;
+}
+
+/* ---- Modal (dialog nativo) ---- */
+.modal {
+  width: min(92vw, 460px);
+  max-height: 88vh;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.modal::backdrop {
+  background: rgba(16, 24, 40, 0.5);
+  backdrop-filter: blur(2px);
+}
+
+.modal__cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal__cabecalho h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.modal__fechar {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  margin: 0;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+}
+
+.modal__fechar:hover {
+  color: var(--text);
+  background: var(--surface-2);
+  box-shadow: none;
+}
+
+.modal__corpo {
+  padding: 1.25rem;
+  overflow-y: auto;
+}
+
+.modal__acoes {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.modal__acoes button {
+  margin: 0;
+}
+
+.modal__acoes button + button {
+  margin-left: 0;
+}
+
+/* ---- Detalhes (dl) ---- */
+.detalhes {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.detalhes > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.detalhes dt {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.detalhes dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 550;
+}
+
 /* ---- Responsivo ---- */
 @media (max-width: 640px) {
   main {
