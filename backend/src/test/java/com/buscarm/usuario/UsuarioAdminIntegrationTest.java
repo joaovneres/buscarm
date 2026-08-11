@@ -3,6 +3,7 @@ package com.buscarm.usuario;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -86,6 +87,24 @@ class UsuarioAdminIntegrationTest {
                         .content("{\"nome\":\"X\",\"username\":\"ab\",\"senha\":\"123\",\"papel\":\"ADMIN\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDACAO"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void adminAlteraNomeEPapel() throws Exception {
+        String corpo = mvc.perform(post("/api/usuarios")
+                        .contentType(MediaType.APPLICATION_JSON).content(NOVO))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        long id = objectMapper.readTree(corpo).get("id").asLong();
+
+        mvc.perform(put("/api/usuarios/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"nome\":\"Ana Paula Leitora\",\"papel\":\"SECRETARIA\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nome").value("Ana Paula Leitora"))
+                .andExpect(jsonPath("$.papel").value("SECRETARIA"))
+                .andExpect(jsonPath("$.username").value("ana.leitora"));
     }
 
     @Test

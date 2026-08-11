@@ -2,20 +2,21 @@
 
 import { useState } from 'react';
 
-import type { NovoUsuario, UsuarioResumo } from '@/entities/usuario/model/types';
+import type { AlteracaoUsuario, NovoUsuario, UsuarioResumo } from '@/entities/usuario/model/types';
 import { rotuloPapel } from '@/shared/auth/roles';
 import { Modal } from '@/shared/ui/Modal';
 
 import { useGestaoUsuarios } from '../model/useGestaoUsuarios';
 import { FormularioUsuario } from './FormularioUsuario';
+import { ModalEditarUsuario } from './ModalEditarUsuario';
 import { ModalResetSenha } from './ModalResetSenha';
 
 export function ListaUsuarios() {
   const g = useGestaoUsuarios();
-  const [modal, setModal] = useState<'criar' | 'reset' | null>(null);
+  const [modal, setModal] = useState<'criar' | 'editar' | 'reset' | null>(null);
   const [alvo, setAlvo] = useState<UsuarioResumo | null>(null);
 
-  function abrir(tipo: 'criar' | 'reset', usuario: UsuarioResumo | null) {
+  function abrir(tipo: 'criar' | 'editar' | 'reset', usuario: UsuarioResumo | null) {
     g.limparErroAcao();
     setAlvo(usuario);
     setModal(tipo);
@@ -23,6 +24,12 @@ export function ListaUsuarios() {
 
   async function criar(dados: NovoUsuario) {
     if (await g.criar(dados)) {
+      setModal(null);
+    }
+  }
+
+  async function editar(id: number, dados: AlteracaoUsuario) {
+    if (await g.alterar(id, dados)) {
       setModal(null);
     }
   }
@@ -66,13 +73,14 @@ export function ListaUsuarios() {
                   </td>
                   <td>{rotuloPapel(u.papel)}</td>
                   <td className="col-acoes">
-                    <button
-                      type="button"
-                      className="btn-secundario"
-                      onClick={() => abrir('reset', u)}
-                    >
-                      Redefinir senha
-                    </button>
+                    <div className="acoes">
+                      <button type="button" className="btn-secundario" onClick={() => abrir('editar', u)}>
+                        Editar
+                      </button>
+                      <button type="button" className="btn-secundario" onClick={() => abrir('reset', u)}>
+                        Redefinir senha
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -89,6 +97,15 @@ export function ListaUsuarios() {
           onCancelar={() => setModal(null)}
         />
       </Modal>
+
+      <ModalEditarUsuario
+        aberto={modal === 'editar'}
+        usuario={alvo}
+        enviando={g.enviando}
+        erro={g.erroAcao}
+        onSalvar={editar}
+        onFechar={() => setModal(null)}
+      />
 
       <ModalResetSenha
         aberto={modal === 'reset'}

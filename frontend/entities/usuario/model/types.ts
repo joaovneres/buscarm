@@ -14,3 +14,8 @@ export interface NovoUsuario {
   senha: string;
   papel: Papel;
 }
+
+export interface AlteracaoUsuario {
+  nome: string;
+  papel: Papel;
+}

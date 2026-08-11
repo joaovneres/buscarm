@@ -2,8 +2,13 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { criarUsuario, listarUsuarios, resetarSenha } from '@/entities/usuario/api/usuarios';
-import type { NovoUsuario, UsuarioResumo } from '@/entities/usuario/model/types';
+import {
+  alterarUsuario,
+  criarUsuario,
+  listarUsuarios,
+  resetarSenha,
+} from '@/entities/usuario/api/usuarios';
+import type { AlteracaoUsuario, NovoUsuario, UsuarioResumo } from '@/entities/usuario/model/types';
 
 export function useGestaoUsuarios() {
   const [lista, setLista] = useState<UsuarioResumo[]>([]);
@@ -51,6 +56,13 @@ export function useGestaoUsuarios() {
     limparErroAcao: () => setErroAcao(null),
     async criar(dados: NovoUsuario): Promise<boolean> {
       const ok = await acao(() => criarUsuario(dados));
+      if (ok) {
+        await carregar();
+      }
+      return ok;
+    },
+    async alterar(id: number, dados: AlteracaoUsuario): Promise<boolean> {
+      const ok = await acao(() => alterarUsuario(id, dados));
       if (ok) {
         await carregar();
       }

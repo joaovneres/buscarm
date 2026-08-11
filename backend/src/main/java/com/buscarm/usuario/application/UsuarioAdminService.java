@@ -53,6 +53,16 @@ public class UsuarioAdminService implements GerenciarUsuariosUseCase, TrocarSenh
 
     @Override
     @Transactional
+    public Usuario alterar(long usuarioId, AlterarUsuarioCommand comando) {
+        Usuario usuario = repositorio.buscarPorId(usuarioId)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException(usuarioId));
+        Usuario alterado = repositorio.atualizar(usuario.comDados(comando.nome(), comando.papel()));
+        registrarAuditoria.registrar("ALTERAR_USUARIO", "USUARIO", usuarioId, alterado.getUsername());
+        return alterado;
+    }
+
+    @Override
+    @Transactional
     public void resetarSenha(long usuarioId, String novaSenha) {
         Usuario usuario = repositorio.buscarPorId(usuarioId)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException(usuarioId));
