@@ -166,6 +166,19 @@ No navegador: abra a URL do Vercel, faça login, cadastre um registro, busque, e
 
 ---
 
+## Manter o backend acordado (keep-alive)
+
+O Render free hiberna após ~15 min sem tráfego. Para evitar o cold start na janela de uso:
+
+- **Janela de horário (recomendado):** o workflow [`keepalive.yml`](../.github/workflows/keepalive.yml)
+  pinga `/actuator/health` a cada 10 min **Seg–Sex, ~07:00–19:00 BRT** (cron em UTC: `*/10 10-21 * * 1-5`).
+  Para mudar a janela, ajuste o `cron` (lembre: UTC = BRT + 3h). Fora da janela o serviço dorme.
+- **24/7:** use o **UptimeRobot** (monitor HTTP a cada 5 min apontando para
+  `https://buscarm.onrender.com/actuator/health`). Não use `/actuator/info` (retorna 401).
+  Atenção: 24/7 consome quase todas as 750 h/mês grátis do Render.
+
+---
+
 ## Validar migrations localmente (opcional)
 
 Reproduz o que já foi validado (Postgres 16 + trigger de auditoria):
