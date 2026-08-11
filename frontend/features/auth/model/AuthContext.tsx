@@ -15,7 +15,8 @@ interface AuthContexto {
   usuario: UsuarioSessao | null;
   autenticado: boolean;
   carregando: boolean;
-  entrar: (username: string, senha: string) => Promise<void>;
+  entrar: (username: string, senha: string) => Promise<UsuarioSessao>;
+  marcarSenhaTrocada: () => void;
   sair: () => void;
 }
 
@@ -32,7 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCarregando(false);
   }, []);
 
-  async function entrar(username: string, senha: string) {
+  async function entrar(username: string, senha: string): Promise<UsuarioSessao> {
     const r = await apiLogin(username, senha);
     const u: UsuarioSessao = {
       nome: r.nome,
@@ -42,6 +43,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
     salvarSessao(r.token, u);
     setUsuario(u);
+    return u;
+  }
+
+  /** Após o usuário trocar a própria senha: limpa o flag de provisória na sessão. */
+  function marcarSenhaTrocada() {
+    setUsuario((atual) => {
+      if (!atual) return atual;
+      const atualizado = { ...atual, senhaProvisoria: false };
+      const token = getToken();
+      if (token) {
+        salvarSessao(token, atualizado);
+      }
+      return atualizado;
+    });
   }
 
   function sair() {
@@ -51,7 +66,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <Contexto.Provider
-      value={{ usuario, autenticado: usuario !== null, carregando, entrar, sair }}
+      value={{
+        usuario,
+        autenticado: usuario !== null,
+        carregando,
+        entrar,
+        marcarSenhaTrocada,
+        sair,
+      }}
     >
       {children}
     </Contexto.Provider>

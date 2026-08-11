@@ -18,8 +18,8 @@ export function LoginForm() {
     setEnviando(true);
     setErro(null);
     try {
-      await entrar(username.trim(), senha);
-      router.push('/registros');
+      const u = await entrar(username.trim(), senha);
+      router.push(u.senhaProvisoria ? '/trocar-senha' : '/registros');
     } catch (err) {
       setErro((err as { message?: string })?.message ?? 'Não foi possível entrar');
       setEnviando(false);
