@@ -85,7 +85,9 @@ public class RegistroPersistenceAdapter implements RegistroRepositoryPort {
                 predicados.add(cb.like(root.get("nomeBusca"), "%" + NomeNormalizer.normalizar(f.nome()) + "%"));
             }
             if (f.inicial() != null && !f.inicial().isBlank()) {
-                predicados.add(cb.like(root.get("nomeBusca"), NomeNormalizer.normalizar(f.inicial()) + "%"));
+                // agrupa pela inicial do SOBRENOME (a chave do índice), acento/caixa-insensível
+                predicados.add(cb.like(cb.lower(root.get("sobrenome")),
+                        NomeNormalizer.normalizar(f.inicial()) + "%"));
             }
             if (f.status() != null) {
                 predicados.add(cb.equal(root.get("status"), f.status().name()));

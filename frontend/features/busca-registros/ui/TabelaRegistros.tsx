@@ -38,7 +38,8 @@ export function TabelaRegistros({ registros, papel, onDetalhe, onEditar, onExclu
         <caption className="sr-only">Registros de matrícula</caption>
         <thead>
           <tr>
-            <th scope="col">Nome</th>
+            <th scope="col">Sobrenome</th>
+            <th scope="col">Nome completo</th>
             <th scope="col">RM</th>
             <th scope="col">Status</th>
             <th scope="col" className="col-acoes">
@@ -55,10 +56,11 @@ export function TabelaRegistros({ registros, papel, onDetalhe, onEditar, onExclu
               <Fragment key={r.id}>
                 {novaLetra && (
                   <tr className="divisoria" aria-hidden>
-                    <td colSpan={4}>{letra}</td>
+                    <td colSpan={5}>{letra}</td>
                   </tr>
                 )}
                 <tr>
+                  <td className="col-sobrenome">{r.sobrenome}</td>
                   <td className="col-nome">{r.nomeCompleto}</td>
                   <td>
                     <span className="rm">{r.rm}</span>
