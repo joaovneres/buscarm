@@ -1,0 +1,39 @@
+name: Keep-alive (Render)
+
+# Mantém o backend acordado apenas na janela útil da secretaria:
+# Seg–Sex, ~07:00–19:00 (BRT, UTC-3). Fora dela o Render free dorme (economiza horas).
+#
+# O Render free hiberna após ~15 min sem tráfego; pingamos /actuator/health a cada 10 min.
+# IMPORTANTE: o cron do GitHub é em UTC. 07:00 BRT = 10:00 UTC → janela 10:00–21:50 UTC.
+# (O Brasil não tem horário de verão desde 2019, então o offset é fixo.)
+#
+# Custo: ~72 execuções/dia × ~22 dias úteis ≈ 1.600 min/mês — dentro dos 2.000 min/mês
+# gratuitos do plano Free para repositório privado.
+# Para 24/7, prefira o UptimeRobot (não consome minutos do Actions).
+
+on:
+  schedule:
+    - cron: '*/10 10-21 * * 1-5'
+  workflow_dispatch: {}
+
+permissions: {}
+
+concurrency:
+  group: keepalive
+  cancel-in-progress: true
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping /actuator/health (acorda o serviço se estiver dormindo)
+        run: |
+          url="https://buscarm.onrender.com/actuator/health"
+          for i in 1 2 3 4 5; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 60 "$url" || echo 000)
+            echo "tentativa $i: HTTP $code"
+            [ "$code" = "200" ] && { echo "serviço acordado ✅"; exit 0; }
+            sleep 12
+          done
+          echo "::warning::backend não respondeu 200 a tempo (cold start longo ou fora do ar)"
+          exit 1
