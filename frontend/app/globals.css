@@ -646,7 +646,7 @@ nav[aria-label='Ações'] a:hover {
   border-radius: 0;
   box-shadow: none;
   margin: 0;
-  min-width: 520px;
+  min-width: 600px;
 }
 
 .tabela-registros thead th {
@@ -662,8 +662,19 @@ nav[aria-label='Ações'] a:hover {
   color: var(--primary);
 }
 
+.col-sobrenome {
+  font-weight: 650;
+}
+
 .col-nome {
-  font-weight: 550;
+  color: var(--text-muted);
+}
+
+.ajuda {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  margin: -0.15rem 0 0.5rem;
 }
 
 /* Divisória alfabética (assinatura do índice físico) */

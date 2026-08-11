@@ -52,14 +52,16 @@ export function FormularioRegistro({ registro, enviando, erro, onSalvar, onCance
         required
       />
 
-      <label htmlFor="reg-nome">Nome (sobrenome, nome)</label>
+      <label htmlFor="reg-nome">Nome completo</label>
       <input
         id="reg-nome"
         value={nomeCompleto}
         onChange={(e) => setNomeCompleto(e.target.value)}
         autoComplete="off"
+        placeholder="Ex.: João Victor de Sousa"
         required
       />
+      <small className="ajuda">O sobrenome é derivado automaticamente (última palavra do nome).</small>
 
       <label htmlFor="reg-ano">Ano do registro</label>
       <input

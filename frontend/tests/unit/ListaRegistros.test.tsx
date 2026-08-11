@@ -56,7 +56,7 @@ describe('ListaRegistros', () => {
 
     await user.click(screen.getByRole('button', { name: /novo registro/i }));
     await user.type(screen.getByLabelText('RM'), '300');
-    await user.type(screen.getByLabelText(/nome \(sobrenome/i), 'Lima, Rui');
+    await user.type(screen.getByLabelText('Nome completo'), 'Lima, Rui');
     await user.click(screen.getByRole('button', { name: /^cadastrar$/i }));
 
     expect(cadastrar).toHaveBeenCalledWith({ rm: 300, nomeCompleto: 'Lima, Rui', anoRegistro: null });

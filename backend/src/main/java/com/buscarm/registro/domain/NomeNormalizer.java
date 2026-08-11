@@ -21,13 +21,23 @@ public final class NomeNormalizer {
         return semAcento.trim().toLowerCase().replaceAll("\\s+", " ");
     }
 
-    /** parte antes da primeira vírgula; se não houver vírgula, o nome inteiro. */
+    /**
+     * Deriva o sobrenome do nome completo (o "de-para"):
+     * <ul>
+     *   <li>Formato "Sobrenome, Nome" (com vírgula): parte antes da vírgula (compatibilidade).</li>
+     *   <li>Nome natural ("Nome ... Sobrenome"): a última palavra é o sobrenome.</li>
+     * </ul>
+     */
     public static String extrairSobrenome(String nomeCompleto) {
         if (nomeCompleto == null || nomeCompleto.isBlank()) {
             return "";
         }
-        int virgula = nomeCompleto.indexOf(',');
-        String sobrenome = virgula >= 0 ? nomeCompleto.substring(0, virgula) : nomeCompleto;
-        return sobrenome.trim();
+        String nome = nomeCompleto.trim().replaceAll("\\s+", " ");
+        int virgula = nome.indexOf(',');
+        if (virgula >= 0) {
+            return nome.substring(0, virgula).trim();
+        }
+        String[] partes = nome.split(" ");
+        return partes[partes.length - 1];
     }
 }

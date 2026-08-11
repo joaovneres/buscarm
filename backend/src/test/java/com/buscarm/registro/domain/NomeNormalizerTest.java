@@ -19,14 +19,15 @@ class NomeNormalizerTest {
     }
 
     @Test
-    void extraiSobrenomeAntesDaVirgula() {
+    void extraiSobrenomeAntesDaVirgulaQuandoHaVirgula() {
         assertThat(NomeNormalizer.extrairSobrenome("Sousa, João Victor Cosme Neres de"))
                 .isEqualTo("Sousa");
     }
 
     @Test
-    void semVirgulaRetornaNomeInteiroComoSobrenome() {
-        assertThat(NomeNormalizer.extrairSobrenome("Maria Aparecida"))
-                .isEqualTo("Maria Aparecida");
+    void derivaSobrenomeDaUltimaPalavraNoNomeNatural() {
+        assertThat(NomeNormalizer.extrairSobrenome("João Victor de Sousa")).isEqualTo("Sousa");
+        assertThat(NomeNormalizer.extrairSobrenome("Maria Aparecida")).isEqualTo("Aparecida");
+        assertThat(NomeNormalizer.extrairSobrenome("Ana")).isEqualTo("Ana");
     }
 }

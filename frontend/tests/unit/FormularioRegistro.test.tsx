@@ -31,7 +31,7 @@ describe('FormularioRegistro', () => {
     render(<FormularioRegistro {...base} onSalvar={onSalvar} />);
 
     await user.type(screen.getByLabelText('RM'), '900');
-    await user.type(screen.getByLabelText(/nome \(sobrenome/i), 'Rocha, Ian');
+    await user.type(screen.getByLabelText('Nome completo'), 'Rocha, Ian');
     await user.click(screen.getByRole('button', { name: /cadastrar/i }));
 
     expect(onSalvar).toHaveBeenCalledWith({ rm: 900, nomeCompleto: 'Rocha, Ian', anoRegistro: null });
