@@ -3,10 +3,11 @@ import { apiPost } from '@/shared/api/client';
 export interface LoginResponse {
   token: string;
   nome: string;
-  email: string;
+  username: string;
   papel: string;
+  senhaProvisoria: boolean;
 }
 
-export function login(email: string, senha: string): Promise<LoginResponse> {
-  return apiPost<LoginResponse>('/api/auth/login', { email, senha });
+export function login(username: string, senha: string): Promise<LoginResponse> {
+  return apiPost<LoginResponse>('/api/auth/login', { username, senha });
 }

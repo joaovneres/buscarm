@@ -1,7 +1,8 @@
 export interface UsuarioSessao {
   nome: string;
-  email: string;
+  username: string;
   papel: string;
+  senhaProvisoria?: boolean;
 }
 
 const CHAVE_TOKEN = 'buscarm.token';

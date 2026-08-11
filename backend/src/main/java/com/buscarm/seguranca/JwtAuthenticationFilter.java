@@ -31,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (header != null && header.startsWith(PREFIXO)) {
             jwtService.validar(header.substring(PREFIXO.length())).ifPresent(a -> {
                 var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + a.papel()));
-                var auth = new UsernamePasswordAuthenticationToken(a.email(), null, authorities);
+                var auth = new UsernamePasswordAuthenticationToken(a.username(), null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(auth);
             });
         }

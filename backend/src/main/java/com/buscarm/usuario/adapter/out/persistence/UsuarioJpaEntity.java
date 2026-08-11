@@ -27,7 +27,7 @@ public class UsuarioJpaEntity {
     private String nome;
 
     @Column(nullable = false, unique = true)
-    private String email;
+    private String username;
 
     @Column(name = "senha_hash", nullable = false)
     private String senhaHash;
@@ -39,6 +39,9 @@ public class UsuarioJpaEntity {
     @Column(nullable = false)
     private boolean ativo = true;
 
+    @Column(name = "senha_provisoria", nullable = false)
+    private boolean senhaProvisoria = false;
+
     @CreationTimestamp
     @Column(name = "criado_em", nullable = false, updatable = false)
     private Instant criadoEm;
@@ -46,12 +49,14 @@ public class UsuarioJpaEntity {
     protected UsuarioJpaEntity() {
     }
 
-    public UsuarioJpaEntity(String nome, String email, String senhaHash, Papel papel, boolean ativo) {
+    public UsuarioJpaEntity(String nome, String username, String senhaHash, Papel papel,
+                            boolean ativo, boolean senhaProvisoria) {
         this.nome = nome;
-        this.email = email;
+        this.username = username;
         this.senhaHash = senhaHash;
         this.papel = papel;
         this.ativo = ativo;
+        this.senhaProvisoria = senhaProvisoria;
     }
 
     public Long getId() {
@@ -62,12 +67,20 @@ public class UsuarioJpaEntity {
         return nome;
     }
 
-    public String getEmail() {
-        return email;
+    public String getUsername() {
+        return username;
+    }
+
+    public Instant getCriadoEm() {
+        return criadoEm;
     }
 
     public String getSenhaHash() {
         return senhaHash;
+    }
+
+    public void setSenhaHash(String senhaHash) {
+        this.senhaHash = senhaHash;
     }
 
     public Papel getPapel() {
@@ -76,5 +89,13 @@ public class UsuarioJpaEntity {
 
     public boolean isAtivo() {
         return ativo;
+    }
+
+    public boolean isSenhaProvisoria() {
+        return senhaProvisoria;
+    }
+
+    public void setSenhaProvisoria(boolean senhaProvisoria) {
+        this.senhaProvisoria = senhaProvisoria;
     }
 }

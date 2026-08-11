@@ -21,18 +21,18 @@ public class UsuarioAdminSeeder implements ApplicationRunner {
     private final UsuarioRepositoryPort repositorio;
     private final CodificadorSenhaPort codificador;
     private final String nome;
-    private final String email;
+    private final String username;
     private final String senha;
 
     public UsuarioAdminSeeder(UsuarioRepositoryPort repositorio,
                               CodificadorSenhaPort codificador,
                               @Value("${buscarm.admin.nome:Administrador}") String nome,
-                              @Value("${buscarm.admin.email:admin@buscarm.local}") String email,
+                              @Value("${buscarm.admin.username:admin}") String username,
                               @Value("${buscarm.admin.senha:admin12345}") String senha) {
         this.repositorio = repositorio;
         this.codificador = codificador;
         this.nome = nome;
-        this.email = email;
+        this.username = username;
         this.senha = senha;
     }
 
@@ -41,7 +41,7 @@ public class UsuarioAdminSeeder implements ApplicationRunner {
         if (repositorio.existeAlgum()) {
             return;
         }
-        repositorio.salvar(Usuario.novo(nome, email, codificador.codificar(senha), Papel.ADMIN));
-        log.warn("Usuário ADMIN inicial criado ({}). ALTERE a senha padrão em produção!", email);
+        repositorio.salvar(Usuario.novo(nome, username, codificador.codificar(senha), Papel.ADMIN));
+        log.warn("Usuário ADMIN inicial criado ({}). ALTERE a senha padrão em produção!", username);
     }
 }

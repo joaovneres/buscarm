@@ -23,7 +23,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public LoginResponse login(@Valid @RequestBody LoginRequest req) {
-        var r = autenticar.autenticar(req.email(), req.senha());
-        return new LoginResponse(r.token(), r.nome(), r.email(), r.papel());
+        var r = autenticar.autenticar(req.username(), req.senha());
+        return new LoginResponse(r.token(), r.nome(), r.username(), r.papel(), r.senhaProvisoria());
     }
 }

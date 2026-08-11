@@ -37,7 +37,7 @@ class AuthIntegrationTest {
 
     @BeforeEach
     void criarUsuario() {
-        usuarios.salvar(Usuario.novo("Secretaria Teste", "sec@teste.com",
+        usuarios.salvar(Usuario.novo("Secretaria Teste", "secretaria",
                 senhas.codificar("senha123"), Papel.SECRETARIA));
     }
 
@@ -45,9 +45,10 @@ class AuthIntegrationTest {
     void loginValidoRetornaToken() throws Exception {
         mvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"sec@teste.com\",\"senha\":\"senha123\"}"))
+                        .content("{\"username\":\"secretaria\",\"senha\":\"senha123\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").isNotEmpty())
+                .andExpect(jsonPath("$.username").value("secretaria"))
                 .andExpect(jsonPath("$.papel").value("SECRETARIA"));
     }
 
@@ -55,7 +56,7 @@ class AuthIntegrationTest {
     void senhaErradaRetorna401() throws Exception {
         mvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"sec@teste.com\",\"senha\":\"errada\"}"))
+                        .content("{\"username\":\"secretaria\",\"senha\":\"errada\"}"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("CREDENCIAIS_INVALIDAS"));
     }

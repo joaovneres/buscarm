@@ -1,11 +1,14 @@
 package com.buscarm.usuario.adapter.out.persistence;
 
+import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import com.buscarm.usuario.application.port.out.UsuarioRepositoryPort;
 import com.buscarm.usuario.domain.Usuario;
+import com.buscarm.usuario.domain.exception.UsuarioNaoEncontradoException;
 
 @Component
 public class UsuarioPersistenceAdapter implements UsuarioRepositoryPort {
@@ -17,8 +20,8 @@ public class UsuarioPersistenceAdapter implements UsuarioRepositoryPort {
     }
 
     @Override
-    public Optional<Usuario> buscarPorEmail(String email) {
-        return repository.findByEmail(email).map(UsuarioPersistenceAdapter::paraDominio);
+    public Optional<Usuario> buscarPorUsername(String username) {
+        return repository.findByUsername(username).map(UsuarioPersistenceAdapter::paraDominio);
     }
 
     @Override
@@ -27,15 +30,36 @@ public class UsuarioPersistenceAdapter implements UsuarioRepositoryPort {
     }
 
     @Override
+    public List<Usuario> listarTodos() {
+        return repository.findAll(Sort.by("nome").ascending()).stream()
+                .map(UsuarioPersistenceAdapter::paraDominio)
+                .toList();
+    }
+
+    @Override
     public Usuario salvar(Usuario usuario) {
         UsuarioJpaEntity salvo = repository.save(new UsuarioJpaEntity(
-                usuario.getNome(), usuario.getEmail(), usuario.getSenhaHash(),
-                usuario.getPapel(), usuario.isAtivo()));
+                usuario.getNome(), usuario.getUsername(), usuario.getSenhaHash(),
+                usuario.getPapel(), usuario.isAtivo(), usuario.isSenhaProvisoria()));
         return paraDominio(salvo);
     }
 
+    @Override
+    public Optional<Usuario> buscarPorId(long id) {
+        return repository.findById(id).map(UsuarioPersistenceAdapter::paraDominio);
+    }
+
+    @Override
+    public Usuario atualizar(Usuario usuario) {
+        UsuarioJpaEntity e = repository.findById(usuario.getId())
+                .orElseThrow(() -> new UsuarioNaoEncontradoException(usuario.getId()));
+        e.setSenhaHash(usuario.getSenhaHash());
+        e.setSenhaProvisoria(usuario.isSenhaProvisoria());
+        return paraDominio(repository.save(e));
+    }
+
     private static Usuario paraDominio(UsuarioJpaEntity e) {
-        return Usuario.reconstituir(e.getId(), e.getNome(), e.getEmail(), e.getSenhaHash(),
-                e.getPapel(), e.isAtivo());
+        return Usuario.reconstituir(e.getId(), e.getNome(), e.getUsername(), e.getSenhaHash(),
+                e.getPapel(), e.isAtivo(), e.isSenhaProvisoria());
     }
 }
