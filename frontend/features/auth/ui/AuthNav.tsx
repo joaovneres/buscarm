@@ -40,6 +40,8 @@ export function AuthNav() {
           {usuario.nome}
           <span className="appbar__role">{rotuloPapel(usuario.papel)}</span>
         </span>
+        <Link href="/registros">Registros</Link>
+        {usuario.papel === 'ADMIN' && <Link href="/usuarios">Usuários</Link>}
         {usuario.papel === 'ADMIN' && <Link href="/auditoria">Auditoria</Link>}
         <Link href="/trocar-senha">Trocar senha</Link>
         <button type="button" onClick={onSair}>
