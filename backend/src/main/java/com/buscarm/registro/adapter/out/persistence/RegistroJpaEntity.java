@@ -44,6 +44,9 @@ public class RegistroJpaEntity {
     @Column(nullable = false)
     private boolean ativo = true;
 
+    @Column(nullable = false, length = 20)
+    private String status = "VALIDADO";
+
     @CreatedBy
     @Column(name = "criado_por", nullable = false, updatable = false)
     private String criadoPor;
@@ -119,6 +122,14 @@ public class RegistroJpaEntity {
         this.ativo = ativo;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     public String getCriadoPor() {
         return criadoPor;
     }
@@ -129,5 +140,9 @@ public class RegistroJpaEntity {
 
     public Instant getCriadoEm() {
         return criadoEm;
+    }
+
+    public Instant getAtualizadoEm() {
+        return atualizadoEm;
     }
 }

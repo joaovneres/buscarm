@@ -48,8 +48,8 @@ public class RegistroApplicationService
         if (repositorio.existePorRm(comando.rm())) {
             throw new RegistroDuplicadoException(comando.rm());
         }
-        Registro salvo = repositorio.salvar(
-                Registro.novo(comando.rm(), comando.nomeCompleto(), comando.anoRegistro()));
+        Registro salvo = repositorio.salvar(Registro.novo(
+                comando.rm(), comando.nomeCompleto(), comando.anoRegistro(), comando.status()));
         registrarAuditoria.registrar("CRIAR", "REGISTRO", salvo.getId(), "RM " + salvo.getRm());
         return salvo;
     }
@@ -75,6 +75,16 @@ public class RegistroApplicationService
         Registro atual = buscarPorId(id);
         repositorio.atualizar(atual.desativado());
         registrarAuditoria.registrar("DESATIVAR", "REGISTRO", id, "RM " + atual.getRm());
+    }
+
+    @Override
+    @Transactional
+    public Registro validar(long id) {
+        usuarioSessao.definirUsuarioSessao(usuarioAtual.getUsuarioAtual());
+        Registro atual = buscarPorId(id);
+        Registro validado = repositorio.atualizar(atual.validado());
+        registrarAuditoria.registrar("VALIDAR", "REGISTRO", id, "RM " + validado.getRm());
+        return validado;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.buscarm.registro.adapter.out.persistence;
 
 import com.buscarm.registro.domain.Registro;
+import com.buscarm.registro.domain.StatusValidacao;
 
 /** Conversão entre o modelo de domínio e a entidade JPA. */
 final class RegistroPersistenceMapper {
@@ -17,9 +18,11 @@ final class RegistroPersistenceMapper {
                 e.getNomeBusca(),
                 e.getAnoRegistro(),
                 e.isAtivo(),
+                StatusValidacao.valueOf(e.getStatus()),
                 e.getCriadoPor(),
                 e.getAtualizadoPor(),
-                e.getCriadoEm()
+                e.getCriadoEm(),
+                e.getAtualizadoEm()
         );
     }
 
@@ -32,6 +35,7 @@ final class RegistroPersistenceMapper {
         e.setNomeBusca(r.getNomeBusca());
         e.setAnoRegistro(r.getAnoRegistro());
         e.setAtivo(r.isAtivo());
+        e.setStatus(r.getStatus().name());
         return e;
     }
 }

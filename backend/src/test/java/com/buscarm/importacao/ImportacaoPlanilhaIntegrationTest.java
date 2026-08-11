@@ -71,11 +71,12 @@ class ImportacaoPlanilhaIntegrationTest {
                 .andExpect(jsonPath("$.status").value("CONFIRMADA"))
                 .andExpect(jsonPath("$.resumo.importados").value(2));
 
-        // os registros passam a ser encontráveis pela busca
+        // os registros passam a ser encontráveis pela busca e nascem PENDENTE (importação em lote)
         mvc.perform(get("/api/registros").param("nome", "joao"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total").value(1))
-                .andExpect(jsonPath("$.conteudo[0].rm").value(203));
+                .andExpect(jsonPath("$.conteudo[0].rm").value(203))
+                .andExpect(jsonPath("$.conteudo[0].status").value("PENDENTE"));
     }
 
     @Test

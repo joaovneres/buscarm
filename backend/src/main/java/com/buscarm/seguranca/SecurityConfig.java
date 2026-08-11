@@ -40,7 +40,17 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
                                 "/actuator/health").permitAll()
+                        // Admin: auditoria e gestão de usuários.
                         .requestMatchers("/api/auditoria/**").hasRole("ADMIN")
+                        .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
+                        // Escrita de registros: ADMIN ou SECRETARIA (VISUALIZADOR não escreve).
+                        .requestMatchers(HttpMethod.POST, "/api/registros/**").hasAnyRole("ADMIN", "SECRETARIA")
+                        .requestMatchers(HttpMethod.PUT, "/api/registros/**").hasAnyRole("ADMIN", "SECRETARIA")
+                        .requestMatchers(HttpMethod.PATCH, "/api/registros/**").hasAnyRole("ADMIN", "SECRETARIA")
+                        .requestMatchers(HttpMethod.DELETE, "/api/registros/**").hasAnyRole("ADMIN", "SECRETARIA")
+                        // Importação em lote é escrita: ADMIN ou SECRETARIA.
+                        .requestMatchers("/api/importacoes/**").hasAnyRole("ADMIN", "SECRETARIA")
+                        // Leitura (GET registros, exportação) e demais: qualquer autenticado.
                         .anyRequest().authenticated())
                 .exceptionHandling(e -> e.authenticationEntryPoint(
                         (req, res, ex) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED)))

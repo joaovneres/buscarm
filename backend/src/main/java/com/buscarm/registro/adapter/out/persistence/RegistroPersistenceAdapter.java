@@ -45,6 +45,7 @@ public class RegistroPersistenceAdapter implements RegistroRepositoryPort {
         e.setNomeBusca(registro.getNomeBusca());
         e.setAnoRegistro(registro.getAnoRegistro());
         e.setAtivo(registro.isAtivo());
+        e.setStatus(registro.getStatus().name());
         return RegistroPersistenceMapper.paraDominio(repository.save(e));
     }
 
