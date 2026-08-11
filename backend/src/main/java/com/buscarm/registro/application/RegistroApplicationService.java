@@ -1,7 +1,5 @@
 package com.buscarm.registro.application;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,8 +10,8 @@ import com.buscarm.registro.application.port.in.CadastrarRegistroUseCase;
 import com.buscarm.registro.application.port.out.RegistroRepositoryPort;
 import com.buscarm.registro.application.port.out.UsuarioSessaoPort;
 import com.buscarm.shared.UsuarioAtualPort;
+import com.buscarm.registro.domain.FiltroRegistros;
 import com.buscarm.registro.domain.Registro;
-import com.buscarm.registro.domain.NomeNormalizer;
 import com.buscarm.registro.domain.exception.RegistroDuplicadoException;
 import com.buscarm.registro.domain.exception.RegistroNaoEncontradoException;
 import com.buscarm.shared.Pagina;
@@ -96,17 +94,7 @@ public class RegistroApplicationService
 
     @Override
     @Transactional(readOnly = true)
-    public Pagina<Registro> pesquisar(String nome, Integer rm, int pagina, int tamanho) {
-        if (rm != null) {
-            List<Registro> encontrados = repositorio.buscarPorRmAtivo(rm)
-                    .map(List::of)
-                    .orElseGet(List::of);
-            return new Pagina<>(encontrados, 0, encontrados.size(), encontrados.size(),
-                    encontrados.isEmpty() ? 0 : 1);
-        }
-        if (nome != null && !nome.isBlank()) {
-            return repositorio.buscarPorNome(NomeNormalizer.normalizar(nome), pagina, tamanho);
-        }
-        return repositorio.listarAtivos(pagina, tamanho);
+    public Pagina<Registro> pesquisar(FiltroRegistros filtro, int pagina, int tamanho) {
+        return repositorio.pesquisar(filtro, pagina, tamanho);
     }
 }

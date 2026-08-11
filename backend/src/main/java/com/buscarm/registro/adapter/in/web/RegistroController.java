@@ -27,7 +27,9 @@ import com.buscarm.registro.application.port.in.BuscarRegistrosUseCase;
 import com.buscarm.registro.application.port.in.CadastrarRegistroUseCase;
 import com.buscarm.registro.application.port.in.CadastrarRegistroUseCase.CadastrarRegistroCommand;
 import com.buscarm.registro.application.port.in.ExportarRegistrosUseCase;
+import com.buscarm.registro.domain.FiltroRegistros;
 import com.buscarm.registro.domain.FormatoExportacao;
+import com.buscarm.registro.domain.StatusValidacao;
 import com.buscarm.shared.ArquivoExportado;
 import com.buscarm.shared.Pagina;
 
@@ -96,14 +98,18 @@ public class RegistroController {
                 .body(arquivo.conteudo());
     }
 
-    /** Pesquisa por nome (parcial, acento-insensível) OU por RM. */
+    /** Pesquisa por nome/RM com filtros opcionais (status, ano, inicial do sobrenome). */
     @GetMapping
     public Pagina<RegistroResponse> pesquisar(
             @RequestParam(required = false) String nome,
             @RequestParam(required = false) Integer rm,
+            @RequestParam(required = false) StatusValidacao status,
+            @RequestParam(required = false) Integer ano,
+            @RequestParam(required = false) String inicial,
             @RequestParam(defaultValue = "0") int pagina,
             @RequestParam(defaultValue = "20") int tamanho) {
-        return buscarRegistros.pesquisar(nome, rm, pagina, tamanho)
+        FiltroRegistros filtro = new FiltroRegistros(nome, rm, status, ano, inicial);
+        return buscarRegistros.pesquisar(filtro, pagina, tamanho)
                 .map(RegistroWebMapper::paraResponse);
     }
 }

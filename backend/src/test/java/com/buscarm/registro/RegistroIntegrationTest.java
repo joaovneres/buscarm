@@ -178,6 +178,25 @@ class RegistroIntegrationTest {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    void filtraPorInicialEStatus() throws Exception {
+        criar(new RegistroRequest(810, "Alves, Nina", null));
+        criar(new RegistroRequest(811, "Bruno, Caio", null));
+
+        mvc.perform(get("/api/registros").param("inicial", "A"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(1))
+                .andExpect(jsonPath("$.conteudo[0].rm").value(810));
+
+        mvc.perform(get("/api/registros").param("status", "VALIDADO"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(2));
+
+        mvc.perform(get("/api/registros").param("status", "PENDENTE"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(0));
+    }
+
     private long criar(RegistroRequest req) throws Exception {
         String corpo = mvc.perform(post("/api/registros")
                         .contentType(MediaType.APPLICATION_JSON)

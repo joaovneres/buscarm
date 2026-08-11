@@ -1,15 +1,21 @@
 package com.buscarm.registro.adapter.out.persistence;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import jakarta.persistence.criteria.Predicate;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import com.buscarm.registro.application.port.out.RegistroRepositoryPort;
+import com.buscarm.registro.domain.FiltroRegistros;
+import com.buscarm.registro.domain.NomeNormalizer;
 import com.buscarm.registro.domain.Registro;
 import com.buscarm.registro.domain.exception.RegistroNaoEncontradoException;
 import com.buscarm.shared.Pagina;
@@ -62,25 +68,33 @@ public class RegistroPersistenceAdapter implements RegistroRepositoryPort {
     }
 
     @Override
-    public Optional<Registro> buscarPorRmAtivo(int rm) {
-        return repository.findByRm(rm)
-                .filter(RegistroJpaEntity::isAtivo)
-                .map(RegistroPersistenceMapper::paraDominio);
+    public Pagina<Registro> pesquisar(FiltroRegistros filtro, int pagina, int tamanho) {
+        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("sobrenome").ascending());
+        return paraPagina(repository.findAll(especificacao(filtro), pageable));
     }
 
-    @Override
-    public Pagina<Registro> buscarPorNome(String nomeNormalizado, int pagina, int tamanho) {
-        return paraPagina(repository.findByAtivoTrueAndNomeBuscaContaining(
-                nomeNormalizado, ordenadoPorSobrenome(pagina, tamanho)));
-    }
-
-    @Override
-    public Pagina<Registro> listarAtivos(int pagina, int tamanho) {
-        return paraPagina(repository.findByAtivoTrue(ordenadoPorSobrenome(pagina, tamanho)));
-    }
-
-    private Pageable ordenadoPorSobrenome(int pagina, int tamanho) {
-        return PageRequest.of(pagina, tamanho, Sort.by("sobrenome").ascending());
+    /** Compõe os critérios opcionais; nulos/vazios são ignorados. Sempre restringe a ativos. */
+    private Specification<RegistroJpaEntity> especificacao(FiltroRegistros f) {
+        return (root, query, cb) -> {
+            List<Predicate> predicados = new ArrayList<>();
+            predicados.add(cb.isTrue(root.get("ativo")));
+            if (f.rm() != null) {
+                predicados.add(cb.equal(root.get("rm"), f.rm()));
+            }
+            if (f.nome() != null && !f.nome().isBlank()) {
+                predicados.add(cb.like(root.get("nomeBusca"), "%" + NomeNormalizer.normalizar(f.nome()) + "%"));
+            }
+            if (f.inicial() != null && !f.inicial().isBlank()) {
+                predicados.add(cb.like(root.get("nomeBusca"), NomeNormalizer.normalizar(f.inicial()) + "%"));
+            }
+            if (f.status() != null) {
+                predicados.add(cb.equal(root.get("status"), f.status().name()));
+            }
+            if (f.ano() != null) {
+                predicados.add(cb.equal(root.get("anoRegistro"), f.ano()));
+            }
+            return cb.and(predicados.toArray(new Predicate[0]));
+        };
     }
 
     private Pagina<Registro> paraPagina(Page<RegistroJpaEntity> page) {

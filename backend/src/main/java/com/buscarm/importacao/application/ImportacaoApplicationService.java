@@ -30,6 +30,7 @@ import com.buscarm.importacao.domain.exception.ImportacaoNaoEncontradaException;
 import com.buscarm.registro.application.port.in.BuscarRegistrosUseCase;
 import com.buscarm.registro.application.port.in.CadastrarRegistroUseCase;
 import com.buscarm.registro.application.port.in.CadastrarRegistroUseCase.CadastrarRegistroCommand;
+import com.buscarm.registro.domain.FiltroRegistros;
 import com.buscarm.registro.domain.NomeNormalizer;
 import com.buscarm.registro.domain.Registro;
 import com.buscarm.registro.domain.StatusValidacao;
@@ -172,7 +173,7 @@ public class ImportacaoApplicationService implements ValidarPlanilhaUseCase, Con
     }
 
     private Optional<String> nomeBuscaCadastrado(int rm) {
-        return buscarRegistros.pesquisar(null, rm, 0, 1).conteudo().stream()
+        return buscarRegistros.pesquisar(FiltroRegistros.porRm(rm), 0, 1).conteudo().stream()
                 .findFirst()
                 .map(Registro::getNomeBusca);
     }
