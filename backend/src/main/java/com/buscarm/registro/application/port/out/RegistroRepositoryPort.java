@@ -3,6 +3,7 @@ package com.buscarm.registro.application.port.out;
 import java.util.List;
 import java.util.Optional;
 
+import com.buscarm.registro.domain.FiltroRegistros;
 import com.buscarm.registro.domain.Registro;
 import com.buscarm.shared.Pagina;
 
@@ -21,9 +22,6 @@ public interface RegistroRepositoryPort {
 
     Optional<Registro> buscarPorId(long id);
 
-    Optional<Registro> buscarPorRmAtivo(int rm);
-
-    Pagina<Registro> buscarPorNome(String nomeNormalizado, int pagina, int tamanho);
-
-    Pagina<Registro> listarAtivos(int pagina, int tamanho);
+    /** Busca paginada de ativos aplicando os filtros (nome/RM/status/ano/inicial), ordenada por sobrenome. */
+    Pagina<Registro> pesquisar(FiltroRegistros filtro, int pagina, int tamanho);
 }
