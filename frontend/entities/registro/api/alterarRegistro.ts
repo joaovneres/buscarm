@@ -1,4 +1,4 @@
-import { apiDelete, apiPut } from '@/shared/api/client';
+import { apiDelete, apiPatch, apiPut } from '@/shared/api/client';
 
 import type { RegistroResponse } from '../model/types';
 
@@ -20,4 +20,9 @@ export function alterarRegistro(
 /** Desativa (exclusão lógica) um registro — o prontuário físico continua existindo. */
 export function desativarRegistro(id: number): Promise<void> {
   return apiDelete(`/api/registros/${id}`);
+}
+
+/** Conclui a conferência de um registro pendente (status → VALIDADO). */
+export function validarRegistro(id: number): Promise<RegistroResponse> {
+  return apiPatch<RegistroResponse>(`/api/registros/${id}/validar`);
 }

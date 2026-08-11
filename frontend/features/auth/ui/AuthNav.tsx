@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { rotuloPapel } from '@/shared/auth/roles';
+
 import { useAuth } from '../model/AuthContext';
 
 /** Mostra o usuário logado e o botão sair, ou um link para entrar. */
@@ -36,7 +38,7 @@ export function AuthNav() {
       <div className="appbar__right">
         <span className="appbar__user">
           {usuario.nome}
-          <span className="appbar__role">{usuario.papel}</span>
+          <span className="appbar__role">{rotuloPapel(usuario.papel)}</span>
         </span>
         {usuario.papel === 'ADMIN' && <Link href="/auditoria">Auditoria</Link>}
         <button type="button" onClick={onSair}>

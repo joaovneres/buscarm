@@ -1,17 +1,18 @@
 import { apiGet } from '@/shared/api/client';
 
-import type { PaginaResponse, RegistroResponse } from '../model/types';
+import type { FiltrosBusca, PaginaResponse, RegistroResponse } from '../model/types';
 
-/** Acesso a dados da entidade Registro: busca por nome (acento-insensível) ou por RM. */
+/** Busca paginada de registros com filtros (nome/RM/status/ano/inicial). */
 export function buscarRegistros(
-  params: { nome?: string; rm?: string },
+  filtros: FiltrosBusca,
 ): Promise<PaginaResponse<RegistroResponse>> {
   const query: Record<string, string> = {};
-  if (params.nome) {
-    query.nome = params.nome;
-  }
-  if (params.rm) {
-    query.rm = params.rm;
-  }
+  if (filtros.nome) query.nome = filtros.nome;
+  if (filtros.rm) query.rm = filtros.rm;
+  if (filtros.status) query.status = filtros.status;
+  if (filtros.ano) query.ano = filtros.ano;
+  if (filtros.inicial) query.inicial = filtros.inicial;
+  query.pagina = String(filtros.pagina ?? 0);
+  query.tamanho = String(filtros.tamanho ?? 20);
   return apiGet<PaginaResponse<RegistroResponse>>('/api/registros', query);
 }

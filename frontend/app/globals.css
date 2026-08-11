@@ -476,13 +476,10 @@ nav[aria-label='Ações'] li {
 
 nav[aria-label='Ações'] a {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 0.3rem;
   height: 100%;
-  padding: 1.1rem 1.25rem;
-  font-size: 1.05rem;
-  font-weight: 600;
+  padding: 1.15rem 1.25rem;
   color: var(--text);
   background: var(--surface);
   border: 1px solid var(--border);
@@ -496,6 +493,24 @@ nav[aria-label='Ações'] a:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
   border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+}
+
+.cartao-nav__titulo {
+  font-size: 1.05rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.cartao-nav__titulo::after {
+  content: ' →';
+  color: var(--primary);
+}
+
+.cartao-nav__desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  line-height: 1.4;
 }
 
 /* ---- Foco visível ---- */

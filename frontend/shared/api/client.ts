@@ -74,6 +74,40 @@ export async function apiPut<T>(path: string, body: unknown): Promise<T> {
   return tratar<T>(res);
 }
 
+export async function apiPatch<T>(path: string, body?: unknown): Promise<T> {
+  const res = await fetch(urlApi(path), {
+    method: 'PATCH',
+    headers: cabecalhos(body === undefined ? {} : { 'Content-Type': 'application/json' }),
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  return tratar<T>(res);
+}
+
+/** PATCH sem corpo de resposta (204 No Content). */
+export async function apiPatchSemResposta(path: string, body?: unknown): Promise<void> {
+  const res = await fetch(urlApi(path), {
+    method: 'PATCH',
+    headers: cabecalhos(body === undefined ? {} : { 'Content-Type': 'application/json' }),
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  if (!res.ok) {
+    if (res.status === 401) {
+      limparSessao();
+    }
+    let corpo: { code?: string; message?: string } | null = null;
+    try {
+      corpo = (await res.json()) as { code?: string; message?: string };
+    } catch {
+      corpo = null;
+    }
+    throw {
+      status: res.status,
+      code: corpo?.code ?? 'ERRO',
+      message: corpo?.message ?? 'Erro ao consultar a API',
+    } as ApiError;
+  }
+}
+
 /** DELETE que não espera corpo de resposta (204 No Content). */
 export async function apiDelete(path: string): Promise<void> {
   const res = await fetch(urlApi(path), { method: 'DELETE', headers: cabecalhos() });
