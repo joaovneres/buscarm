@@ -38,6 +38,29 @@ describe('ListaUsuarios', () => {
     await waitFor(() => expect(listar).toHaveBeenCalledTimes(2));
   });
 
+  it('edita o nome e o papel de um usuário', async () => {
+    vi.spyOn(api, 'listarUsuarios').mockResolvedValue([
+      { id: 1, nome: 'Ana', username: 'ana', papel: 'VISUALIZADOR', ativo: true },
+    ]);
+    const alterar = vi
+      .spyOn(api, 'alterarUsuario')
+      .mockResolvedValue({ id: 1, nome: 'Ana Paula', username: 'ana', papel: 'SECRETARIA', ativo: true });
+
+    const user = userEvent.setup();
+    render(<ListaUsuarios />);
+    await screen.findByText('ana');
+
+    await user.click(screen.getByRole('button', { name: /editar/i }));
+    const form = screen.getByRole('form', { name: /editar usuário/i });
+    const nome = within(form).getByLabelText('Nome');
+    await user.clear(nome);
+    await user.type(nome, 'Ana Paula');
+    await user.selectOptions(within(form).getByLabelText('Papel'), 'SECRETARIA');
+    await user.click(within(form).getByRole('button', { name: /salvar alterações/i }));
+
+    expect(alterar).toHaveBeenCalledWith(1, { nome: 'Ana Paula', papel: 'SECRETARIA' });
+  });
+
   it('redefine a senha de um usuário', async () => {
     vi.spyOn(api, 'listarUsuarios').mockResolvedValue([
       { id: 1, nome: 'Ana', username: 'ana', papel: 'VISUALIZADOR', ativo: true },

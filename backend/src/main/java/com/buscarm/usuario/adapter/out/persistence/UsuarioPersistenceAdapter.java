@@ -53,6 +53,9 @@ public class UsuarioPersistenceAdapter implements UsuarioRepositoryPort {
     public Usuario atualizar(Usuario usuario) {
         UsuarioJpaEntity e = repository.findById(usuario.getId())
                 .orElseThrow(() -> new UsuarioNaoEncontradoException(usuario.getId()));
+        e.setNome(usuario.getNome());
+        e.setPapel(usuario.getPapel());
+        e.setAtivo(usuario.isAtivo());
         e.setSenhaHash(usuario.getSenhaHash());
         e.setSenhaProvisoria(usuario.isSenhaProvisoria());
         return paraDominio(repository.save(e));

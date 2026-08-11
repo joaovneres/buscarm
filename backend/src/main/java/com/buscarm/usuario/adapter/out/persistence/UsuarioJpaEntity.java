@@ -67,6 +67,18 @@ public class UsuarioJpaEntity {
         return nome;
     }
 
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setPapel(Papel papel) {
+        this.papel = papel;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
     public String getUsername() {
         return username;
     }

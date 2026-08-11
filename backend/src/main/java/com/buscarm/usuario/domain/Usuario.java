@@ -36,6 +36,11 @@ public final class Usuario {
         return new Usuario(id, nome, username, novoHash, papel, ativo, provisoria);
     }
 
+    /** Cópia com nome e papel alterados (username e credenciais preservados). */
+    public Usuario comDados(String novoNome, Papel novoPapel) {
+        return new Usuario(id, novoNome, username, senhaHash, novoPapel, ativo, senhaProvisoria);
+    }
+
     public Long getId() {
         return id;
     }

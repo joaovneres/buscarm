@@ -12,10 +12,17 @@ public interface GerenciarUsuariosUseCase {
 
     List<Usuario> listar();
 
+    /** Altera nome e papel de um usuário existente (username e senha preservados). */
+    Usuario alterar(long usuarioId, AlterarUsuarioCommand comando);
+
     /** Admin redefine a senha de um usuário (senha provisória: ele deverá trocá-la depois). */
     void resetarSenha(long usuarioId, String novaSenha);
 
     /** Comando de criação (independente do DTO web). */
     record CriarUsuarioCommand(String nome, String username, String senha, Papel papel) {
+    }
+
+    /** Comando de alteração (nome e papel). */
+    record AlterarUsuarioCommand(String nome, Papel papel) {
     }
 }
