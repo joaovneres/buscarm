@@ -5,8 +5,8 @@ import { TrocarSenha } from '@/features/conta/ui/TrocarSenha';
 export default function TrocarSenhaPage() {
   return (
     <RequireAuth>
+      <AuthNav />
       <main>
-        <AuthNav />
         <div>
           <h1>Trocar senha</h1>
           <p>Escolha uma nova senha para a sua conta.</p>

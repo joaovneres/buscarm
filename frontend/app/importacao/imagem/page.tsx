@@ -5,8 +5,8 @@ import { ImportarImagem } from '@/features/importar-imagem/ui/ImportarImagem';
 export default function ImportacaoImagemPage() {
   return (
     <RequireAuth>
+      <AuthNav />
       <main>
-        <AuthNav />
         <h1>Importar por foto (OCR)</h1>
         <p>
           Fotografe uma página do livro. O sistema reconhece o texto; você <strong>revisa e

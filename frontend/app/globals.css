@@ -5,19 +5,21 @@
    responsivo (mobile-first). Acessível (foco visível, contraste, motion).
    ========================================================================== */
 
-/* Paleta inspirada na identidade institucional da SEDUC-SP / Governo de São Paulo:
-   azul institucional dominante sobre superfícies claras. Tema CLARO por padrão;
-   o modo escuro é ativado manualmente (data-theme="dark"). */
+/* Identidade "índice físico": o livro de matrículas (um ledger pautado)
+   traduzido para a tela. IBM Plex Sans na interface; IBM Plex Mono nos
+   números de registro (RM), tratados como número de catálogo. Paleta
+   institucional SEDUC-SP / Governo de São Paulo: azul dominante sobre papel
+   frio. Tema CLARO por padrão; escuro em data-theme="dark". */
 :root {
-  --bg: #eef2f8;
-  --bg-grad: radial-gradient(1200px 600px at 100% -10%, #dbe6fa 0%, transparent 60%),
-             radial-gradient(1000px 500px at -10% 0%, #e4ecf7 0%, transparent 55%);
+  --bg: #e7ecf3;
+  --page-top: rgba(255, 255, 255, 0.6);
+  --ledger-line: rgba(15, 71, 161, 0.05);
   --surface: #ffffff;
-  --surface-2: #f3f6fb;
+  --surface-2: #f2f5fb;
   --text: #14203a;
-  --text-muted: #566080;
-  --border: #dfe5f0;
-  --border-strong: #c6cfe0;
+  --text-muted: #56607f;
+  --border: #dbe2ee;
+  --border-strong: #c3cddf;
 
   --primary: #0f47a1;
   --primary-hover: #0c3a84;
@@ -31,20 +33,20 @@
   --success-soft: #e6f4ec;
   --warning-soft: #fdf3e0;
 
-  --ring: rgba(15, 71, 161, 0.4);
-  --shadow-sm: 0 1px 2px rgba(15, 32, 71, 0.06), 0 1px 3px rgba(15, 32, 71, 0.08);
-  --shadow-md: 0 4px 12px rgba(15, 32, 71, 0.1), 0 2px 4px rgba(15, 32, 71, 0.06);
+  --ring: rgba(15, 71, 161, 0.38);
+  --shadow-sm: 0 1px 2px rgba(15, 32, 71, 0.05), 0 1px 3px rgba(15, 32, 71, 0.07);
+  --shadow-md: 0 8px 26px rgba(15, 32, 71, 0.12), 0 2px 6px rgba(15, 32, 71, 0.06);
 
-  --radius: 12px;
-  --radius-sm: 8px;
+  --radius: 14px;
+  --radius-sm: 9px;
   --radius-pill: 999px;
   --space: 1rem;
 }
 
 :root[data-theme='dark'] {
   --bg: #0b1220;
-  --bg-grad: radial-gradient(1200px 600px at 100% -10%, #12233f 0%, transparent 60%),
-             radial-gradient(1000px 500px at -10% 0%, #101a2e 0%, transparent 55%);
+  --page-top: rgba(94, 155, 246, 0.05);
+  --ledger-line: rgba(255, 255, 255, 0.035);
   --surface: #141c2b;
   --surface-2: #1b2436;
   --text: #e8ecf3;
@@ -66,7 +68,7 @@
 
   --ring: rgba(94, 155, 246, 0.5);
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 * {
@@ -80,10 +82,13 @@ html {
 body {
   margin: 0;
   min-height: 100dvh;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans, system-ui), -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   color: var(--text);
   background-color: var(--bg);
-  background-image: var(--bg-grad);
+  /* Pauta discreta de livro-razão sob o conteúdo: o "papel" do índice. */
+  background-image:
+    linear-gradient(180deg, var(--page-top), transparent 240px),
+    repeating-linear-gradient(to bottom, transparent 0 30px, var(--ledger-line) 30px 31px);
   background-attachment: fixed;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
@@ -93,9 +98,9 @@ body {
 /* ---- Layout ---- */
 main {
   width: 100%;
-  max-width: 780px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: clamp(1rem, 2vw + 0.5rem, 2.25rem);
+  padding: clamp(1rem, 2.5vw + 0.5rem, 2.75rem);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -103,16 +108,18 @@ main {
 
 /* ---- Tipografia ---- */
 h1 {
-  font-size: clamp(1.5rem, 3.5vw, 2rem);
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+  font-size: clamp(1.55rem, 3.4vw, 2.05rem);
+  line-height: 1.16;
+  letter-spacing: -0.025em;
+  font-weight: 600;
   margin: 0;
 }
 
 h2 {
   font-size: clamp(1.15rem, 2.5vw, 1.35rem);
   line-height: 1.25;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
+  font-weight: 600;
   margin: 0 0 0.75rem;
 }
 
@@ -120,7 +127,7 @@ h2 {
 h1 + p {
   color: var(--text-muted);
   font-size: 1.02rem;
-  margin: -0.35rem 0 0;
+  margin: 0.35rem 0 0;
   max-width: 62ch;
 }
 
@@ -138,66 +145,100 @@ strong {
   font-weight: 650;
 }
 
-/* ---- Header do app (AuthNav) ---- */
+/* ---- Cabeçalho do app (AuthNav) — barra de topo em toda a largura ---- */
 .appbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: 0.6rem 1rem;
   flex-wrap: wrap;
-  padding: 0.6rem 0.9rem;
-  background: color-mix(in srgb, var(--surface) 80%, transparent);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  padding: 0.6rem clamp(1rem, 4vw, 2.75rem);
+  background: color-mix(in srgb, var(--surface) 85%, transparent);
+  border-bottom: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
-  backdrop-filter: saturate(140%) blur(6px);
+  backdrop-filter: saturate(150%) blur(8px);
 }
 
 .appbar__brand {
-  font-weight: 750;
-  font-size: 1.1rem;
-  letter-spacing: -0.02em;
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.03em;
   color: var(--text);
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.55rem;
 }
 
 .appbar__brand:hover {
   text-decoration: none;
 }
 
+/* Marca: etiqueta de catálogo com "RM" em mono, como um carimbo do livro. */
 .appbar__brand::before {
-  content: '';
-  width: 0.7rem;
-  height: 1.15rem;
-  border-radius: 3px;
-  background: linear-gradient(160deg, var(--primary), color-mix(in srgb, var(--primary) 60%, #46c08a));
+  content: 'RM';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--primary-contrast);
+  background: linear-gradient(160deg, var(--primary), color-mix(in srgb, var(--primary) 60%, #1a7a4f));
+  border-radius: 7px;
+  box-shadow: var(--shadow-sm);
 }
 
 .appbar__right {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.15rem 0.3rem;
   flex-wrap: wrap;
 }
 
-.appbar__user {
+/* Links do cabeçalho viram "abas" discretas */
+.appbar__right > a {
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--radius-sm);
   color: var(--text-muted);
+  font-weight: 550;
+  font-size: 0.94rem;
+}
+
+.appbar__right > a:hover {
+  text-decoration: none;
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.appbar__user {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--text);
+  font-weight: 550;
   font-size: 0.92rem;
+  padding-right: 0.55rem;
+  margin-right: 0.15rem;
+  border-right: 1px solid var(--border);
 }
 
 .appbar__role {
   display: inline-block;
-  font-size: 0.72rem;
-  font-weight: 650;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   color: var(--primary);
   background: var(--primary-soft);
-  padding: 0.1rem 0.5rem;
+  padding: 0.12rem 0.5rem;
   border-radius: var(--radius-pill);
-  margin-left: 0.35rem;
 }
 
 /* ---- Seções como cartões ---- */
@@ -418,9 +459,11 @@ caption {
 
 thead th {
   background: var(--surface-2);
-  font-size: 0.78rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.07em;
   color: var(--text-muted);
 }
 
@@ -476,17 +519,30 @@ nav[aria-label='Ações'] li {
 }
 
 nav[aria-label='Ações'] a {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.35rem;
   height: 100%;
-  padding: 1.15rem 1.25rem;
+  padding: 1.2rem 1.3rem;
   color: var(--text);
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
-  transition: transform 0.12s, box-shadow 0.15s, border-color 0.15s;
+  overflow: hidden;
+  transition: transform 0.14s, box-shadow 0.16s, border-color 0.16s;
+}
+
+/* Marcador da aba: acende no hover, como puxar a ficha do fichário. */
+nav[aria-label='Ações'] a::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--primary);
+  opacity: 0;
+  transition: opacity 0.16s;
 }
 
 nav[aria-label='Ações'] a:hover {
@@ -494,6 +550,10 @@ nav[aria-label='Ações'] a:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
   border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+}
+
+nav[aria-label='Ações'] a:hover::before {
+  opacity: 1;
 }
 
 .cartao-nav__titulo {
@@ -617,11 +677,12 @@ nav[aria-label='Ações'] a:hover {
 }
 
 .filtro > span {
-  font-size: 0.78rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
   font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.06em;
 }
 
 .filtro select,
@@ -655,19 +716,53 @@ nav[aria-label='Ações'] a:hover {
   top: 0;
 }
 
-/* RM como "número de catálogo" — tabular, destacado */
+/* RM como "número de catálogo" — carimbo mono, tabular, destacado */
 .rm {
+  font-family: var(--font-mono, monospace);
   font-variant-numeric: tabular-nums;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
   color: var(--primary);
+  background: var(--primary-soft);
+  padding: 0.14rem 0.45rem;
+  border-radius: 6px;
+  white-space: nowrap;
 }
 
-.col-sobrenome {
-  font-weight: 650;
+/* Célula "pessoa" no padrão Minimal: avatar (inicial) + nome/subtítulo */
+.pessoa {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
-.col-nome {
+.avatar {
+  flex: none;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.pessoa__txt {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.pessoa__nome {
+  font-weight: 600;
+}
+
+.pessoa__sub {
+  font-size: 0.82rem;
   color: var(--text-muted);
 }
 
@@ -678,19 +773,249 @@ nav[aria-label='Ações'] a:hover {
   margin: -0.15rem 0 0.5rem;
 }
 
-.login-topo {
-  display: flex;
-  justify-content: flex-end;
+/* ==========================================================================
+   Tela de login (home deslogada e /login): split-screen com painel de marca
+   ========================================================================== */
+.tela-espera {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
 }
 
-/* Divisória alfabética (assinatura do índice físico) */
+.auth {
+  position: relative;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+}
+
+.auth__topo {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 3;
+}
+
+.auth__topo .icone-btn {
+  color: var(--text);
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  border-color: var(--border);
+  backdrop-filter: blur(6px);
+}
+
+/* ---- Painel de marca (hero) — o fichário do índice ---- */
+.auth__hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.6rem;
+  padding: clamp(2rem, 5vw, 4rem);
+  color: #fff;
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 31px, rgba(255, 255, 255, 0.06) 31px 32px),
+    radial-gradient(135% 135% at 0% 0%,
+      color-mix(in srgb, var(--primary) 74%, #1a7a4f) 0%,
+      var(--primary) 46%,
+      var(--primary-hover) 100%);
+}
+
+.auth__marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.auth__stamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+}
+
+.auth__wordmark {
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.auth__lema {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.6vw, 2.15rem);
+  line-height: 1.18;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  max-width: 15ch;
+}
+
+.auth__rodape {
+  margin: 0;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* Fichas empilhadas: as fichas do índice físico. */
+.fichario {
+  position: relative;
+  height: 220px;
+  width: min(360px, 100%);
+}
+
+.ficha {
+  position: absolute;
+  width: 300px;
+  max-width: 100%;
+  padding: 1.05rem 1.15rem 1.2rem;
+  background: #fff;
+  color: var(--text);
+  border-radius: 12px;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.3);
+}
+
+.ficha__tab {
+  position: absolute;
+  top: -0.7rem;
+  right: 1.3rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.7rem;
+  height: 1.45rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: #fff;
+  background: var(--primary);
+  border-radius: 0 0 6px 6px;
+}
+
+.ficha__nome {
+  display: block;
+  height: 0.7rem;
+  width: 62%;
+  border-radius: 4px;
+  background: var(--surface-2);
+  box-shadow: 0 12px 0 -6px var(--surface-2);
+}
+
+.ficha__rm {
+  display: inline-block;
+  margin-top: 1.35rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--primary);
+}
+
+.ficha--c {
+  top: 0;
+  left: 52px;
+  transform: rotate(6deg);
+  z-index: 1;
+}
+
+.ficha--b {
+  top: 26px;
+  left: 26px;
+  transform: rotate(3deg);
+  z-index: 2;
+}
+
+.ficha--a {
+  top: 58px;
+  left: 0;
+  transform: rotate(-2deg);
+  z-index: 3;
+}
+
+/* ---- Painel do formulário (sobrescreve o <main> global) ---- */
+main.auth__painel {
+  max-width: none;
+  width: auto;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  background: var(--bg);
+}
+
+.auth__cartao {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth__cartao > h1 {
+  margin-top: 0.85rem;
+}
+
+.auth__cartao > p {
+  color: var(--text-muted);
+  margin: 0.2rem 0 0.4rem;
+}
+
+.auth__cartao-marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.auth__cartao-marca::before {
+  content: 'RM';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--primary-contrast);
+  background: linear-gradient(160deg, var(--primary), color-mix(in srgb, var(--primary) 60%, #1a7a4f));
+  border-radius: 7px;
+  box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 880px) {
+  .auth {
+    grid-template-columns: 1fr;
+  }
+
+  .auth__hero {
+    display: none;
+  }
+}
+
+/* Divisória alfabética (assinatura do índice físico): aba de fichário */
 .divisoria td {
   background: var(--surface-2);
-  padding: 0.3rem 0.8rem;
-  font-size: 0.82rem;
-  font-weight: 750;
-  letter-spacing: 0.08em;
+  padding: 0.35rem 0.8rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   color: var(--primary);
+  border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
 

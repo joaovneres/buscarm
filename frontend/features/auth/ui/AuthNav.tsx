@@ -20,7 +20,7 @@ export function AuthNav() {
 
   if (!autenticado || !usuario) {
     return (
-      <header className="appbar">
+      <nav className="appbar">
         <Link href="/" className="appbar__brand">
           BuscaRM
         </Link>
@@ -28,12 +28,12 @@ export function AuthNav() {
           <BotaoTema />
           <Link href="/login">Entrar</Link>
         </div>
-      </header>
+      </nav>
     );
   }
 
   return (
-    <header className="appbar">
+    <nav className="appbar">
       <Link href="/registros" className="appbar__brand">
         BuscaRM
       </Link>
@@ -51,6 +51,6 @@ export function AuthNav() {
           Sair
         </button>
       </div>
-    </header>
+    </nav>
   );
 }

@@ -5,8 +5,8 @@ import { ConsultarAuditoria } from '@/features/consultar-auditoria/ui/ConsultarA
 export default function AuditoriaPage() {
   return (
     <RequireAuth>
+      <AuthNav />
       <main>
-        <AuthNav />
         <h1>Auditoria</h1>
         <p>Histórico das ações sensíveis (acesso restrito a administradores).</p>
         <ConsultarAuditoria />

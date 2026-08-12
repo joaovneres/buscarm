@@ -13,8 +13,8 @@ export default function UsuariosPage() {
 
   return (
     <RequireAuth>
+      <AuthNav />
       <main>
-        <AuthNav />
         <div>
           <h1>Usuários</h1>
           <p>Cadastre quem acessa o sistema e redefina senhas quando necessário.</p>

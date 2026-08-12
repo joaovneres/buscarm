@@ -5,8 +5,8 @@ import { ImportarPlanilha } from '@/features/importar-planilha/ui/ImportarPlanil
 export default function ImportacaoPlanilhaPage() {
   return (
     <RequireAuth>
+      <AuthNav />
       <main>
-        <AuthNav />
         <h1>Importar registros por planilha</h1>
         <p>
           Envie a planilha (.xlsx) com as colunas <strong>Nome</strong> e <strong>RM</strong>. Nada é
