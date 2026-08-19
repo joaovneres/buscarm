@@ -105,6 +105,55 @@ class ImportacaoPlanilhaIntegrationTest {
     }
 
     @Test
+    void validaCsvComVirgulaNoNomeEDelimitadorPontoEVirgula() throws Exception {
+        // separador ";" e o nome "Sousa, João" carrega vírgula entre aspas — não pode quebrar o campo
+        String csv = "RM;Nome\n"
+                + "203;\"Sousa, João Victor Cosme Neres de\"\n"
+                + "390;\"Souza, Davi\"\n"
+                + ";Sem RM\n";
+
+        MvcResult resultado = mvc.perform(multipart("/api/importacoes/planilha/validar")
+                        .file(new MockMultipartFile("arquivo", "alunos.csv", "text/csv",
+                                csv.getBytes(java.nio.charset.StandardCharsets.UTF_8))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("VALIDADA"))
+                .andExpect(jsonPath("$.resumo.total").value(3))
+                .andExpect(jsonPath("$.resumo.validos").value(2))
+                .andExpect(jsonPath("$.resumo.invalidos").value(1))
+                .andReturn();
+
+        long importacaoId = objectMapper.readTree(resultado.getResponse().getContentAsString())
+                .get("id").asLong();
+
+        String body = objectMapper.writeValueAsString(
+                new ConfirmarBody(importacaoId, new int[]{2, 3}));
+        mvc.perform(post("/api/importacoes/planilha/confirmar")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resumo.importados").value(2));
+
+        // o nome preservou a vírgula e continua encontrável pela busca
+        mvc.perform(get("/api/registros").param("nome", "joao"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(1))
+                .andExpect(jsonPath("$.conteudo[0].rm").value(203));
+    }
+
+    @Test
+    void csvComDelimitadorVirgulaEBom() throws Exception {
+        // Excel costuma exportar CSV UTF-8 com BOM; delimitador vírgula e nome sem vírgula interna
+        String csv = "﻿RM,Nome\n700,Pereira Ana\n";
+
+        mvc.perform(multipart("/api/importacoes/planilha/validar")
+                        .file(new MockMultipartFile("arquivo", "alunos.csv", "text/csv",
+                                csv.getBytes(java.nio.charset.StandardCharsets.UTF_8))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resumo.total").value(1))
+                .andExpect(jsonPath("$.resumo.validos").value(1));
+    }
+
+    @Test
     void arquivoSemColunasRetorna400() throws Exception {
         byte[] planilha = planilha(new Object[][]{
                 {"Coluna A", "Coluna B"},

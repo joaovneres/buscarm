@@ -20,14 +20,19 @@ export function UploadPlanilha({
 
   return (
     <form onSubmit={onSubmit} aria-label="Envio de planilha">
-      <label htmlFor="arquivo">Planilha de registros (.xlsx)</label>
+      <label htmlFor="arquivo">Planilha de registros (.xlsx ou .csv)</label>
       <input
         id="arquivo"
         name="arquivo"
         type="file"
-        accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         onChange={(e) => setArquivo(e.target.files?.[0] ?? null)}
+        aria-describedby="arquivo-ajuda"
       />
+      <p id="arquivo-ajuda">
+        A planilha precisa ter as colunas <strong>Nome</strong> e <strong>RM</strong>. Em CSV, aceita
+        separador vírgula ou ponto e vírgula.
+      </p>
       <button type="submit" disabled={!arquivo || validando}>
         {validando ? 'Validando…' : 'Validar planilha'}
       </button>

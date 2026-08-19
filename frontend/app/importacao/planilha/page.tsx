@@ -9,8 +9,9 @@ export default function ImportacaoPlanilhaPage() {
       <main>
         <h1>Importar registros por planilha</h1>
         <p>
-          Envie a planilha (.xlsx) com as colunas <strong>Nome</strong> e <strong>RM</strong>. Nada é
-          gravado sem sua confirmação na pré-visualização.
+          Envie a planilha em <strong>.xlsx</strong> ou <strong>.csv</strong> com as colunas{' '}
+          <strong>Nome</strong> e <strong>RM</strong>. Nada é gravado sem sua confirmação na
+          pré-visualização.
         </p>
         <ImportarPlanilha />
       </main>
