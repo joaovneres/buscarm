@@ -1,12 +1,21 @@
 'use client';
 
-import { AuthNav } from '@/features/auth/ui/AuthNav';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
 import { TelaLogin } from '@/features/auth/ui/TelaLogin';
 import { useAuth } from '@/features/auth/model/AuthContext';
-import { HomeNav } from '@/features/navegacao/ui/HomeNav';
 
 export default function Home() {
   const { autenticado, carregando } = useAuth();
+  const router = useRouter();
+
+  // Não há tela inicial própria: logado vai direto para os registros.
+  useEffect(() => {
+    if (!carregando && autenticado) {
+      router.replace('/registros');
+    }
+  }, [carregando, autenticado, router]);
 
   if (carregando) {
     return (
@@ -16,22 +25,14 @@ export default function Home() {
     );
   }
 
-  // Deslogado: a home É a tela de login.
-  if (!autenticado) {
-    return <TelaLogin />;
+  if (autenticado) {
+    return (
+      <div className="tela-espera">
+        <p role="status">Redirecionando…</p>
+      </div>
+    );
   }
 
-  // Logado: hub do app com a navegação disponível.
-  return (
-    <>
-      <AuthNav />
-      <main>
-        <div>
-          <h1>BuscaRM</h1>
-          <p>Encontre o RM de um aluno pelo nome para localizar o prontuário físico.</p>
-        </div>
-        <HomeNav />
-      </main>
-    </>
-  );
+  // Deslogado: a home É a tela de login.
+  return <TelaLogin />;
 }
