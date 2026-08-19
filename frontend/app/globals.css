@@ -612,8 +612,22 @@ nav[aria-label='Ações'] a:hover::before {
 }
 
 .lista__topo button,
+.lista__topo .btn,
 .lista__topo section {
   margin: 0;
+}
+
+/* Importar + Exportar ficam agrupados à direita do topo */
+.lista__topo-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+/* Links de ação no topo (ex.: Importar) não sublinham como texto */
+.lista__topo .btn:hover {
+  text-decoration: none;
 }
 
 /* Exportar (dentro do topo) fica compacto, sem cara de cartão */

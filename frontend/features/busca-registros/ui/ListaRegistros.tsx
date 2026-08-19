@@ -5,6 +5,7 @@ import { useState } from 'react';
 import type { RegistroResponse } from '@/entities/registro/model/types';
 import { useAuth } from '@/features/auth/model/AuthContext';
 import { ExportarRegistros } from '@/features/exportar-registros/ui/ExportarRegistros';
+import { ImportarRegistros } from '@/features/importar-registros/ui/ImportarRegistros';
 import { podeEscrever } from '@/shared/auth/roles';
 
 import { useAcoesRegistro } from '../model/useAcoesRegistro';
@@ -70,7 +71,10 @@ export function ListaRegistros() {
             + Novo registro
           </button>
         )}
-        <ExportarRegistros />
+        <div className="lista__topo-acoes">
+          {escreve && <ImportarRegistros />}
+          <ExportarRegistros />
+        </div>
       </div>
 
       <BarraBusca onAplicar={aplicarFiltros} />
