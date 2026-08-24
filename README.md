@@ -46,6 +46,6 @@ Instruções de execução do backend e frontend serão adicionadas em `backend/
 ## Deploy
 
 - **Runbook passo a passo:** [`docs/deploy.md`](./docs/deploy.md) — Neon → Render → Vercel,
-  com deploy manual versionado (ADR-0005).
+  com **deploy automático a partir do Git** (ADR-0005).
 - **Segredos e onde moram:** [`docs/CONFIGURACAO_NUVEM.md`](./docs/CONFIGURACAO_NUVEM.md).
 - **Blueprint do backend:** [`render.yaml`](./render.yaml).

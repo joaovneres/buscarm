@@ -180,7 +180,7 @@ Estrutura **Feature-Sliced** (`app / features / entities / shared`). Cliente HTT
 
 ## 5. Pipeline / CI/CD (GitHub Actions) — como funciona
 
-Estratégia: **CI automática em todo PR** e **deploy manual versionado** (ADR-0004 / ADR-0005).
+Estratégia: **CI automática em todo PR** e **deploy automático a partir do Git** (ADR-0004 / ADR-0005).
 
 ### 5.1 `ci.yml` — em todo Pull Request e push na `main`
 - **job `backend`** — Java 21 (Temurin), `mvn -B verify` (build + testes).
@@ -189,22 +189,31 @@ Estratégia: **CI automática em todo PR** e **deploy manual versionado** (ADR-0
 - Os três jobs são os **status checks obrigatórios** para o merge na `main` (branch protegida,
   merge só via PR aprovado — regra em `.github/rulesets/main-protection.json`).
 
-### 5.2 `release.yml` — ao criar tag SemVer (`v*`)
-- Empacota o backend e **publica imagem Docker versionada no GHCR**
-  (`ghcr.io/.../buscarm-backend:vX.Y.Z` + `latest`).
-- Faz o build do frontend e sobe como artifact. **Não faz deploy.**
+### 5.2 Deploy — automático a partir do Git (não há workflow de deploy)
+- **Backend (Render):** serviço **Docker ligado ao repo** (`rootDir: backend`, builda
+  `backend/Dockerfile`, `branch: main`, **`autoDeploy: on`**) → publica a cada push na `main`,
+  em `https://buscarm.onrender.com`. **Não** usa a imagem do GHCR.
+- **Frontend (Vercel):** projeto ligado ao repo → publica produção a cada push na `main` e gera
+  preview por PR. `NEXT_PUBLIC_API_URL` fixado em `frontend/vercel.json`.
+- Migrations **Flyway** rodam no start do backend.
 
-### 5.3 `deploy.yml` — deploy MANUAL (`workflow_dispatch`)
-- Entradas: `version` (tag) e `target` (`backend` / `frontend` / `ambos`).
-- Roda no environment `producao` (permite exigir aprovação).
-- **Backend:** dispara deploy hook do **Render** apontando para a imagem versionada do GHCR.
-- **Frontend:** dispara deploy hook do **Vercel**.
-- Deploy é sempre de uma **versão já construída** — nunca builda direto para produção.
+### 5.3 `release.yml` — ao criar tag SemVer (`v*`)
+- Publica **imagem Docker versionada no GHCR** (`buscarm-backend:vX.Y.Z` + `latest`) e o build do
+  frontend como artifact — **artefatos versionados para rastreabilidade/rollback**, não a fonte do
+  deploy. **Não faz deploy.**
 
-### 5.4 `keepalive.yml`
-- Mantém o serviço do Render (plano free) acordado.
+### 5.4 `smoke.yml` — verificação pós-deploy (T11.7, `workflow_dispatch`)
+- Confere `/actuator/health` do backend (tolerando o cold start do free tier) e, se informada, a
+  URL do frontend. Rode em **Actions → Smoke (produção)** após publicar.
 
-**Configuração de nuvem:** `render.yaml` (blueprint do backend), `docs/deploy.md` (runbook
+### 5.5 `keepalive.yml`
+- Mantém o serviço do Render (plano free) acordado na janela útil (Seg–Sex, ~7h–19h BRT).
+
+> A ADR-0005 previa originalmente um `deploy.yml` **manual** por deploy hooks/imagem GHCR; na
+> prática o provisionamento seguiu por auto-deploy do Git, então esse workflow foi **removido**
+> (ver "Atualização 2026-08-24" na ADR-0005).
+
+**Configuração de nuvem:** `render.yaml` (referência de blueprint), `docs/deploy.md` (runbook
 Neon → Render → Vercel), `docs/CONFIGURACAO_NUVEM.md` (segredos e onde moram).
 
 ---
@@ -231,7 +240,7 @@ Neon → Render → Vercel), `docs/CONFIGURACAO_NUVEM.md` (segredos e onde moram
 | 6 — Exportação e backup | ✅ Concluído | .xlsx/.csv + `scripts/backup.sh` + `docs/BACKUP.md` |
 | 7 — OCR (foto) | ✅ Majoritário | Migrado para binário nativo `tesseract` (`--psm 3`), grande ganho de acerto numa página real (2/18 → 39/42). Falta pré-processamento OpenCV (T7.2) e medição real formal (T7.8) |
 | 9 — Auditoria | ✅ Concluído | Registro + consulta + rastreabilidade da origem |
-| 11 — DevOps/CI/CD | 🟡 Parcial | Pipelines prontos e nuvem **provisionada** (Neon/Render/Vercel; backend vivo em `buscarm.onrender.com` com keep-alive, frontend no Vercel já apontando pra ele). Falta criar os **deploy hooks** e registrá-los como secrets (`RENDER_DEPLOY_HOOK_URL`/`VERCEL_DEPLOY_HOOK_URL`) para o `deploy.yml` automatizado, mais o smoke test de produção |
+| 11 — DevOps/CI/CD | ✅ Concluído (essencial) | Nuvem provisionada e **deploy automático a partir do Git** funcionando: Render builda `backend/Dockerfile` e publica a cada push na `main` (`buscarm.onrender.com`, com keep-alive); Vercel publica o frontend. CI (backend/frontend/e2e) obrigatória por PR; `smoke.yml` para verificação pós-deploy. Pendências menores: token do Vercel com escopo do time (para operar por CLI) e medir/formalizar |
 | 1 / 2 | ✅ Implementado na prática | Modelagem e backend base existem (checkboxes não marcados no plano) |
 | 8 — Acessibilidade | ⬜ Pendente | Bases feitas; falta auditoria axe-core/Lighthouse formal |
 | 10 — Testes (cobertura formal) | 🟡 Em andamento | Vários testes existem; falta meta de cobertura/relatório |
@@ -239,8 +248,8 @@ Neon → Render → Vercel), `docs/CONFIGURACAO_NUVEM.md` (segredos e onde moram
 
 **Resumo:** o **fluxo-fim demonstrável** já existe de ponta a ponta —
 `Planilha → Importação (validar/preview/confirmar) → Busca por nome → RM`, mais OCR por foto,
-autenticação, auditoria e exportação. O que falta é sobretudo **operacional** (fechar a
-automação de deploy — deploy hooks/secrets — e rodar com dados reais) e **acadêmico/qualidade**
+autenticação, auditoria e exportação. Está **no ar** com deploy automático (Render + Vercel). O que
+falta é sobretudo **operacional** (rodar com dados reais da secretaria) e **acadêmico/qualidade**
 (acessibilidade formal, métricas, relatórios).
 
 ---

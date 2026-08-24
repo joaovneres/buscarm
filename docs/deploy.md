@@ -1,22 +1,27 @@
 # Deploy do BuscaRM — runbook
 
 Passo a passo para colocar o BuscaRM no ar: **Neon** (Postgres) → **Render** (backend) →
-**Vercel** (frontend), com deploy **manual versionado** (ADR-0005). Para o mapa de _quais_
-segredos existem e _onde_ moram, ver [`CONFIGURACAO_NUVEM.md`](./CONFIGURACAO_NUVEM.md).
+**Vercel** (frontend), com **deploy automático a partir do Git** (ADR-0005). Para o mapa de
+_quais_ segredos existem e _onde_ moram, ver [`CONFIGURACAO_NUVEM.md`](./CONFIGURACAO_NUVEM.md).
 
 > **Regra de ouro:** segredo nunca vai para o repositório. Vai para o painel do Render/Vercel
-> (variáveis de runtime) ou para _secrets_ do GitHub Actions (deploy hooks).
+> (variáveis de runtime do serviço).
 
 ## Visão geral do fluxo
 
 ```
-tag vX.Y.Z ──► release.yml ──► imagem GHCR  ──► (deploy manual) ──► Render (backend)
-                              ghcr.io/joaovneres/buscarm-backend:vX.Y.Z
-push na main ─► CI verde ─────► deploy.yml (workflow_dispatch) ──► Vercel (frontend)
+push na main ─► CI verde ─► Render builda backend/Dockerfile e publica  (auto-deploy)
+                          └► Vercel rebuilda o frontend e publica       (auto-deploy)
+
+tag vX.Y.Z ──► release.yml ──► imagem GHCR + build do front (artefatos versionados p/ rastreabilidade)
 ```
 
-- **Build** de versão é automático ao criar a tag; **deploy** é manual (você escolhe quando).
-- O backend roda a **imagem já construída** no GHCR; o Render só a publica.
+- **Deploy é automático:** Render e Vercel estão ligados ao repo e publicam a cada push na `main`.
+  Não há deploy hooks nem passo manual — o gatilho é o próprio merge na `main`.
+- O Render **builda o `backend/Dockerfile`** direto do repo (não puxa a imagem do GHCR).
+- A tag (`release.yml`) só gera **artefatos versionados** (imagem GHCR + build do front) para
+  rastreabilidade/rollback; não é a fonte do deploy.
+- Depois de publicar, rode o **smoke test** (§6) para confirmar que a produção está de pé.
 
 ---
 
@@ -50,29 +55,25 @@ push na main ─► CI verde ─────► deploy.yml (workflow_dispatch) �
 
 ---
 
-## 2. Backend — Render (Docker, imagem do GHCR)
+## 2. Backend — Render (Docker buildado do repo)
 
-### 2.1 Publicar a primeira imagem versionada
+### 2.1 Criar o serviço
 
-```bash
-git checkout main && git pull
-git tag v0.1.0
-git push origin v0.1.0        # dispara release.yml → publica ghcr.io/joaovneres/buscarm-backend:v0.1.0
-```
+O serviço em produção é um **Web Service Docker ligado ao repositório**, que **builda o
+`backend/Dockerfile`** a cada push — não puxa imagem do GHCR. Como está configurado hoje:
 
-Acompanhe em **Actions → Release**. Ao final existe a imagem no GHCR.
+| Campo | Valor |
+| --- | --- |
+| Nome | `buscarm` (URL `https://buscarm.onrender.com`) |
+| Runtime | Docker (`dockerfilePath: ./Dockerfile`, `dockerContext: .`) |
+| Root Directory | `backend` |
+| Branch | `main` |
+| Auto-Deploy | **On** (publica a cada push na `main`) |
+| Health Check Path | `/actuator/health` |
 
-> **Visibilidade do GHCR:** por padrão o pacote é **privado**. Para o Render puxar sem credencial,
-> torne-o **público** (GitHub → seu perfil → Packages → `buscarm-backend` → Package settings →
-> Change visibility → Public). Alternativa: adicionar uma _registry credential_ no Render.
-
-### 2.2 Criar o serviço
-
-Opção A — **Blueprint** (usa o [`render.yaml`](../render.yaml) do repo): Render → **New → Blueprint**
-→ selecione o repositório. Ele cria o serviço `buscarm-backend` já com as variáveis pedindo valor.
-
-Opção B — **manual**: New → Web Service → _Deploy an existing image_ →
-`ghcr.io/joaovneres/buscarm-backend:v0.1.0`. Health check path: `/actuator/health`. `autoDeploy` off.
+Para recriar: Render → **New → Web Service** → conecte `joaovneres/buscarm` → Root Directory
+`backend` → Runtime **Docker** → Branch `main` → Auto-Deploy **On**. (O [`render.yaml`](../render.yaml)
+do repo serve de referência de blueprint.)
 
 ### 2.3 Variáveis de ambiente (Environment)
 
@@ -82,18 +83,16 @@ Opção B — **manual**: New → Web Service → _Deploy an existing image_ →
 | `DB_USER` / `DB_PASSWORD` | credenciais do Neon |
 | `JWT_SECRET` | segredo forte (≥ 32 bytes) — o Blueprint gera; ou `openssl rand -base64 48` |
 | `CORS_ALLOWED_ORIGINS` | **preencher depois** com a URL do Vercel (passo 3) |
-| `ADMIN_EMAIL` | e-mail do admin inicial (ex.: `secretaria@escola.br`) |
+| `ADMIN_USERNAME` | usuário do admin inicial (login é por username — ver V7; ex.: `secretaria`) |
 | `ADMIN_PASSWORD` | senha forte do admin inicial (**não** use o default) |
 
-Suba o serviço. Anote a URL pública, ex.: `https://buscarm-backend.onrender.com`.
+Suba o serviço. A URL pública é `https://buscarm.onrender.com`.
 
-### 2.4 Deploy Hook do backend
+### 2.4 Publicação (automática)
 
-Render → serviço → **Settings → Deploy Hook** → copie a URL. Guarde como _secret_ do GitHub:
-
-```bash
-gh secret set RENDER_DEPLOY_HOOK_URL --repo joaovneres/buscarm
-```
+Com **Auto-Deploy On**, cada push na `main` dispara build + publish no Render — não há deploy
+hook nem passo manual. Para republicar sem novo commit (ex.: após mudar uma env var), use
+**Manual Deploy → Deploy latest commit** no painel do Render.
 
 ---
 
@@ -109,53 +108,61 @@ gh secret set RENDER_DEPLOY_HOOK_URL --repo joaovneres/buscarm
    backend mudar, atualize esse arquivo (a variável é inlinada no build; exige novo deploy).
    Para sobrescrever pontualmente, defina `NEXT_PUBLIC_API_URL` nas Environment Variables do projeto.
 4. Deploy. Anote a URL, ex.: `https://buscarm.vercel.app`.
-5. **Deploy Hook do frontend:** Settings → Git → **Deploy Hooks** → crie um (branch `main`) → copie:
-   ```bash
-   gh secret set VERCEL_DEPLOY_HOOK_URL --repo joaovneres/buscarm
-   ```
+5. **Publicação (automática):** com o projeto ligado ao Git, a Vercel publica **produção** a cada
+   push na `main` e gera **preview** por PR. Não há deploy hook nem passo manual.
 
 ---
 
 ## 4. Fechar o laço do CORS
 
 Volte ao **Render** e defina `CORS_ALLOWED_ORIGINS` = URL do Vercel (ex.: `https://buscarm.vercel.app`),
-depois **redeploy** o backend (Manual Deploy, ou o passo 5). Sem isso o navegador bloqueia as chamadas.
+depois **redeploy** o backend (Manual Deploy → Deploy latest commit). Sem isso o navegador bloqueia
+as chamadas.
 
 > Ordem resumida: **backend primeiro** (para ter a URL) → frontend com essa URL → volta e ajusta o
 > CORS do backend → redeploy do backend.
 
 ---
 
-## 5. Deploy manual versionado (uso recorrente)
+## 5. Publicar uma nova versão (uso recorrente)
 
-Depois que os serviços existem, cada nova versão é: **tag → build automático → deploy manual**.
+O deploy é **automático**: basta o merge na `main` (Render e Vercel publicam sozinhos). Fluxo:
 
 ```bash
-git tag v0.2.0 && git push origin v0.2.0     # release.yml publica a imagem :v0.2.0
+# abra um PR, deixe o CI verde (backend/frontend/e2e), faça o merge na main.
+# → Render builda backend/Dockerfile e publica; Vercel rebuilda o frontend.
 ```
 
-GitHub → **Actions → Deploy → Run workflow**:
-- **version:** `v0.2.0`
-- **target:** `ambos` (ou só `backend`/`frontend`)
+Opcionalmente, marque a versão para rastreabilidade (gera imagem GHCR + build do front como
+artefatos; **não** afeta o deploy):
 
-O job usa o _environment_ `producao` (dá para exigir aprovação em Settings → Environments) e dispara
-os deploy hooks — Render publica a imagem `:v0.2.0`, Vercel rebuilda o frontend.
+```bash
+git tag v0.2.0 && git push origin v0.2.0     # dispara release.yml (artefatos versionados)
+```
+
+Depois de publicar, rode o **smoke test** (§6).
 
 ---
 
 ## 6. Smoke test em produção (T11.7)
 
+Automatizado em **Actions → Smoke (produção) → Run workflow** (`.github/workflows/smoke.yml`):
+informe `backend_url` (default `https://buscarm.onrender.com`) e, opcionalmente, `frontend_url`.
+Ele já lida com o cold start do free tier (repete até o serviço acordar).
+
+Manualmente, se preferir:
+
 ```bash
 # 1) Saúde do backend
-curl -s https://buscarm-backend.onrender.com/actuator/health      # {"status":"UP"}
+curl -s https://buscarm.onrender.com/actuator/health      # {"status":"UP"}
 
-# 2) Login (admin inicial)
-curl -s -X POST https://buscarm-backend.onrender.com/api/auth/login \
+# 2) Login (admin inicial) — o campo é "username" (não "email"; ver migration V7)
+curl -s -X POST https://buscarm.onrender.com/api/auth/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"SEU_ADMIN_EMAIL","senha":"SUA_ADMIN_SENHA"}'       # retorna { token, ... }
+  -d '{"username":"SEU_ADMIN_USERNAME","senha":"SUA_ADMIN_SENHA"}'   # retorna { token, ... }
 
 # 3) Busca autenticada
-curl -s https://buscarm-backend.onrender.com/api/registros \
+curl -s https://buscarm.onrender.com/api/registros \
   -H "Authorization: Bearer <TOKEN>"
 ```
 
@@ -200,5 +207,5 @@ docker rm -f pgtest
 - [ ] `ADMIN_PASSWORD` alterado (não `admin12345`); considere trocar a senha após o 1º login
 - [ ] `CORS_ALLOWED_ORIGINS` = exatamente a URL do Vercel (com `https://`, sem barra final)
 - [ ] `DATABASE_URL` com `sslmode=require` (Neon exige TLS)
-- [ ] Pacote GHCR público **ou** _registry credential_ no Render
-- [ ] `/actuator/health` responde `UP` e o login funciona
+- [ ] Render com Auto-Deploy **On** na `main` e Root Directory `backend`
+- [ ] `/actuator/health` responde `UP` e o login funciona (rode o workflow **Smoke**)

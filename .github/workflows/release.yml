@@ -1,7 +1,9 @@
 name: Release
 
-# Ao criar uma tag SemVer (vX.Y.Z), gera automaticamente a imagem Docker versionada do
-# backend (GHCR) e o build do frontend. NÃO faz deploy — isso é manual (deploy.yml). ADR-0005.
+# Ao criar uma tag SemVer (vX.Y.Z), gera artefatos versionados para rastreabilidade/rollback:
+# a imagem Docker do backend (GHCR) e o build do frontend. NÃO faz deploy nem é a fonte do
+# deploy — o deploy de produção é automático (Render e Vercel publicam a cada push na main;
+# ver docs/deploy.md e ADR-0005). Estes artefatos servem ao versionamento (relatório/vídeo).
 on:
   push:
     tags: ['v*']
