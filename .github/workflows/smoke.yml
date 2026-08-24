@@ -1,0 +1,52 @@
+name: Smoke (produção)
+
+# Verificação pós-deploy (T11.7): confere que o backend no Render responde saudável e, se
+# informada, que a URL do frontend está acessível. NÃO faz deploy — o deploy é automático
+# (Render/Vercel publicam a cada push na main; ver docs/deploy.md e ADR-0005). Rode à mão
+# depois de um deploy ou quando quiser confirmar que a produção está de pé.
+on:
+  workflow_dispatch:
+    inputs:
+      backend_url:
+        description: 'URL base do backend (Render)'
+        required: true
+        default: 'https://buscarm.onrender.com'
+      frontend_url:
+        description: 'URL do frontend (Vercel) — deixe vazio para pular'
+        required: false
+        default: ''
+
+jobs:
+  smoke:
+    name: smoke
+    runs-on: ubuntu-latest
+    steps:
+      - name: Backend /actuator/health = UP
+        env:
+          BASE: ${{ inputs.backend_url }}
+        run: |
+          # O plano free do Render hiberna: a 1ª chamada "acorda" o serviço (~30–60s).
+          # Tentamos por até ~3 min antes de falhar.
+          for i in $(seq 1 18); do
+            corpo=$(curl -sS -m 20 "$BASE/actuator/health" || true)
+            echo "tentativa $i: ${corpo:-<sem resposta>}"
+            if echo "$corpo" | grep -q '"status":"UP"'; then
+              echo "Backend saudável."
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::Backend não respondeu UP em $BASE/actuator/health"
+          exit 1
+
+      - name: Frontend acessível (opcional)
+        if: ${{ inputs.frontend_url != '' }}
+        env:
+          URL: ${{ inputs.frontend_url }}
+        run: |
+          codigo=$(curl -sS -m 30 -o /dev/null -w '%{http_code}' -L "$URL" || echo "000")
+          echo "HTTP $codigo em $URL"
+          case "$codigo" in
+            2*|3*) echo "Frontend acessível." ;;
+            *) echo "::error::Frontend não respondeu 2xx/3xx (HTTP $codigo)"; exit 1 ;;
+          esac

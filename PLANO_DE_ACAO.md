@@ -142,11 +142,11 @@ Marque `[x]` ao concluir. Divisão de responsáveis será definida mais adiante.
 ## Épico 11 — DevOps / CI/CD / Deploy
 - [x] **T11.1** Dockerfile do backend
 - [x] **T11.2** GitHub Actions: build + testes (back e front) em PR — ver [ADR-0005](./docs/adr/0005-ci-cd.md)
-- [x] **T11.3** Versionamento (SemVer + tags) e geração de releases (release.yml + deploy.yml)
-- [~] **T11.4** Deploy backend no Render — pronto: [`render.yaml`](./render.yaml) + config por env + runbook [`docs/deploy.md`](./docs/deploy.md). Falta o dono provisionar a conta/segredos.
-- [~] **T11.5** Deploy frontend no Vercel — runbook pronto em [`docs/deploy.md`](./docs/deploy.md). Falta provisionar.
-- [~] **T11.6** Banco Neon + migrations Flyway — migrations `V1..V5` **validadas em Postgres 16** (inclusive o trigger). Falta apontar para o Neon real.
-- [ ] **T11.7** Smoke test em produção (script em [`docs/deploy.md`](./docs/deploy.md#6-smoke-test-em-produção-t117))
+- [x] **T11.3** Versionamento (SemVer + tags) e geração de artefatos versionados (release.yml → imagem GHCR + build do front, para rastreabilidade)
+- [x] **T11.4** Deploy backend no Render — **no ar** em `https://buscarm.onrender.com` (serviço Docker do repo, auto-deploy na `main`); [`render.yaml`](./render.yaml) + runbook [`docs/deploy.md`](./docs/deploy.md)
+- [x] **T11.5** Deploy frontend no Vercel — projeto ligado ao repo, auto-deploy na `main` (`NEXT_PUBLIC_API_URL` em [`frontend/vercel.json`](./frontend/vercel.json))
+- [x] **T11.6** Banco Neon + migrations Flyway — Neon real ligado; migrations rodam no start do backend (validadas em Postgres 16, inclusive o trigger)
+- [x] **T11.7** Smoke test em produção — workflow [`smoke.yml`](./.github/workflows/smoke.yml) (health do backend + frontend); ver [`docs/deploy.md`](./docs/deploy.md#6-smoke-test-em-produção-t117)
 
 ## Épico 12 — Validação com a comunidade e entregas acadêmicas
 - [ ] **T12.1** Apresentar 1ª versão à secretaria (feedback)

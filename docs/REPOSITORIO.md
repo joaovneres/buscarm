@@ -43,8 +43,7 @@ gh api -X PUT repos/joaovneres/buscarm/collaborators/<usuario> -f permission=pus
 Com um segundo revisor, os PRs passam a ser aprovados de verdade e o bypass de admin deixa de
 ser necessário no dia a dia (pode ser removido do ruleset se quiserem endurecer).
 
-## Segredos de deploy (mais tarde — ver CONFIGURACAO_NUVEM.md)
-```
-gh secret set RENDER_DEPLOY_HOOK_URL --repo joaovneres/buscarm
-gh secret set VERCEL_DEPLOY_HOOK_URL --repo joaovneres/buscarm
-```
+## Segredos de deploy
+O deploy é **automático a partir do Git** (Render e Vercel publicam a cada push na `main`), então
+**não há secrets de deploy no GitHub Actions**. Os segredos de runtime moram nos painéis do
+Render/Vercel — ver [CONFIGURACAO_NUVEM.md](./CONFIGURACAO_NUVEM.md).
