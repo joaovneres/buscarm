@@ -1,39 +1,56 @@
-name: Keep-alive (Render)
+name: Warm-up (Render) — manual
 
-# Mantém o backend acordado apenas na janela útil da secretaria:
-# Seg–Sex, ~07:00–19:00 (BRT, UTC-3). Fora dela o Render free dorme (economiza horas).
+# Acorda o backend no Render sob demanda. NÃO é mais um keep-alive agendado.
 #
-# O Render free hiberna após ~15 min sem tráfego; pingamos /actuator/health a cada 10 min.
-# IMPORTANTE: o cron do GitHub é em UTC. 07:00 BRT = 10:00 UTC → janela 10:00–21:50 UTC.
-# (O Brasil não tem horário de verão desde 2019, então o offset é fixo.)
+# Por que o agendamento saiu: o `schedule` do GitHub Actions é best-effort e descarta crons de
+# alta frequência. Medido neste repositório em out/2026 com o cron `*/10 10-21 * * 1-5`
+# (72 execuções/dia esperadas):
 #
-# Custo: ~72 execuções/dia × ~22 dias úteis ≈ 1.600 min/mês — dentro dos 2.000 min/mês
-# gratuitos do plano Free para repositório privado.
-# Para 24/7, prefira o UptimeRobot (não consome minutos do Actions).
+#   execuções reais ......... 1 a 4 por dia (347 de ~3.600 desde 10/ago, ~10%)
+#   intervalo entre pings ... mediana 4h06m, mínimo 2h01m, máximo 68h
+#   intervalos > 15 min ..... 99 de 99 (100%)
+#   fora da janela 10-21 UTC. 29 de 100 (runs enfileirados com horas de atraso)
+#
+# Como o Render free hiberna após ~15 min sem tráfego e TODOS os intervalos passaram de 15 min,
+# o workflow agendado nunca impediu uma hibernação — só acordava o serviço ~3x/dia.
+#
+# O keep-alive de verdade é um monitor HTTP externo (cron-job.org/UptimeRobot) a cada 5 min.
+# Configuração em docs/deploy.md, seção "Manter o backend acordado".
+#
+# Use este workflow para acordar o serviço à mão antes de uma demonstração ou de um teste.
 
 on:
-  schedule:
-    - cron: '*/10 10-21 * * 1-5'
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'URL base do backend'
+        required: true
+        default: 'https://buscarm.onrender.com'
 
 permissions: {}
 
+# cancel-in-progress ficaria errado aqui: o cold start pode levar ~1 min e um segundo disparo
+# cancelaria a tentativa de acordar que está em andamento.
 concurrency:
-  group: keepalive
-  cancel-in-progress: true
+  group: warmup
+  cancel-in-progress: false
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
       - name: Ping /actuator/health (acorda o serviço se estiver dormindo)
+        env:
+          BASE_URL: ${{ inputs.url }}
         run: |
-          url="https://buscarm.onrender.com/actuator/health"
+          url="${BASE_URL%/}/actuator/health"
+          echo "pingando $url"
           for i in 1 2 3 4 5; do
+            inicio=$(date +%s)
             code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 60 "$url" || echo 000)
-            echo "tentativa $i: HTTP $code"
+            echo "tentativa $i: HTTP $code ($(( $(date +%s) - inicio ))s)"
             [ "$code" = "200" ] && { echo "serviço acordado ✅"; exit 0; }
             sleep 12
           done
-          echo "::warning::backend não respondeu 200 a tempo (cold start longo ou fora do ar)"
+          echo "::error::backend não respondeu 200 em 5 tentativas (cold start longo ou fora do ar)"
           exit 1
