@@ -51,3 +51,6 @@ tmp/
 
 # ---- Backups gerados localmente (scripts/backup.sh) ----
 backups/
+
+# ---- Dados migrados do Supabase (scripts/migrar-supabase.mjs) ----
+migracao/
