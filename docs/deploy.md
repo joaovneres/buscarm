@@ -175,14 +175,56 @@ No navegador: abra a URL do Vercel, faça login, cadastre um registro, busque, e
 
 ## Manter o backend acordado (keep-alive)
 
-O Render free hiberna após ~15 min sem tráfego. Para evitar o cold start na janela de uso:
+O Render free hiberna após ~15 min sem tráfego. O keep-alive precisa, portanto, pingar em
+intervalos **menores que 15 min** — e essa é a parte que o GitHub Actions não entrega.
 
-- **Janela de horário (recomendado):** o workflow [`keepalive.yml`](../.github/workflows/keepalive.yml)
-  pinga `/actuator/health` a cada 10 min **Seg–Sex, ~07:00–19:00 BRT** (cron em UTC: `*/10 10-21 * * 1-5`).
-  Para mudar a janela, ajuste o `cron` (lembre: UTC = BRT + 3h). Fora da janela o serviço dorme.
-- **24/7:** use o **UptimeRobot** (monitor HTTP a cada 5 min apontando para
-  `https://buscarm.onrender.com/actuator/health`). Não use `/actuator/info` (retorna 401).
-  Atenção: 24/7 consome quase todas as 750 h/mês grátis do Render.
+### Não use `schedule` do GitHub Actions para isto
+
+O `schedule` é **best-effort**: o GitHub descarta e atrasa crons de alta frequência. Medição feita
+neste repositório em out/2026, com o cron `*/10 10-21 * * 1-5` (72 execuções/dia esperadas):
+
+| Métrica | Esperado | Medido |
+| --- | --- | --- |
+| Execuções por dia útil | 72 | **1 a 4** |
+| Intervalo entre pings | 10 min | mediana **4h06m**, mínimo 2h01m, máximo 68h |
+| Intervalos acima de 15 min | 0 | **99 de 99 (100%)** |
+| Execuções desde 10/ago | ~3.600 | 347 (~10%) |
+| Fora da janela `10-21 UTC` | 0 | 29 de 100 |
+
+Como **todos** os intervalos passaram de 15 min, o workflow agendado nunca impediu uma
+hibernação: ele apenas acordava o serviço ~3x/dia. As execuções fora da janela (22:12, 23:39,
+00:24 UTC) são runs enfileirados com horas de atraso — a confirmação de que o `*/10` não é honrado.
+
+Um agravante: `schedule` é **desativado automaticamente após 60 dias sem atividade** no
+repositório, sem aviso no workflow.
+
+### Configuração correta: monitor HTTP externo
+
+Use o [cron-job.org](https://cron-job.org) (grátis, resolução de 1 min e com janela de horário):
+
+| Campo | Valor |
+| --- | --- |
+| URL | `https://buscarm.onrender.com/actuator/health` |
+| Método | `GET` |
+| Intervalo | **5 min** |
+| Dias | Seg–Sex |
+| Horas | `10:00–21:59 UTC` (= 07:00–18:59 BRT) |
+| Sucesso esperado | HTTP `200`, corpo com `"status":"UP"` |
+
+O intervalo de 5 min dá folga de 3x sobre os 15 min do Render. A janela Seg–Sex preserva a
+intenção original e segura o consumo de horas: 12 h × ~22 dias úteis ≈ **264 h/mês**, bem dentro
+das 750 h/mês grátis do Render. Pingar 24/7 também caberia (~730 h), mas sem folga alguma.
+
+O **UptimeRobot** serve igualmente bem, com a ressalva de que o plano grátis monitora 24/7 sem
+janela de horário — o que gasta quase toda a cota de horas do Render.
+
+Não aponte o monitor para `/actuator/info`: retorna 401.
+
+### Acordar à mão
+
+O workflow [`keepalive.yml`](../.github/workflows/keepalive.yml) virou **warm-up manual**
+(`workflow_dispatch`), útil antes de uma demonstração: **Actions → Warm-up (Render) — manual**.
+Ele repete o ping até 5 vezes para tolerar o cold start.
 
 ---
 
