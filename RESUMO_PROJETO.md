@@ -206,8 +206,12 @@ Estratégia: **CI automática em todo PR** e **deploy automático a partir do Gi
 - Confere `/actuator/health` do backend (tolerando o cold start do free tier) e, se informada, a
   URL do frontend. Rode em **Actions → Smoke (produção)** após publicar.
 
-### 5.5 `keepalive.yml`
-- Mantém o serviço do Render (plano free) acordado na janela útil (Seg–Sex, ~7h–19h BRT).
+### 5.5 `keepalive.yml` — warm-up manual (`workflow_dispatch`)
+- Acorda o serviço do Render sob demanda (antes de uma demonstração, por exemplo).
+- **Deixou de ser agendado em out/2026:** o `schedule` do GitHub descarta crons de alta
+  frequência — medimos 1–4 execuções/dia em vez de 72, com **100% dos intervalos acima dos 15 min**
+  de hibernação do Render. O keep-alive real é um monitor HTTP externo a cada 5 min
+  (ver "Manter o backend acordado" em `docs/deploy.md`).
 
 > A ADR-0005 previa originalmente um `deploy.yml` **manual** por deploy hooks/imagem GHCR; na
 > prática o provisionamento seguiu por auto-deploy do Git, então esse workflow foi **removido**
@@ -240,7 +244,7 @@ Neon → Render → Vercel), `docs/CONFIGURACAO_NUVEM.md` (segredos e onde moram
 | 6 — Exportação e backup | ✅ Concluído | .xlsx/.csv + `scripts/backup.sh` + `docs/BACKUP.md` |
 | 7 — OCR (foto) | ✅ Majoritário | Migrado para binário nativo `tesseract` (`--psm 3`), grande ganho de acerto numa página real (2/18 → 39/42). Falta pré-processamento OpenCV (T7.2) e medição real formal (T7.8) |
 | 9 — Auditoria | ✅ Concluído | Registro + consulta + rastreabilidade da origem |
-| 11 — DevOps/CI/CD | ✅ Concluído (essencial) | Nuvem provisionada e **deploy automático a partir do Git** funcionando: Render builda `backend/Dockerfile` e publica a cada push na `main` (`buscarm.onrender.com`, com keep-alive); Vercel publica o frontend. CI (backend/frontend/e2e) obrigatória por PR; `smoke.yml` para verificação pós-deploy. Pendências menores: token do Vercel com escopo do time (para operar por CLI) e medir/formalizar |
+| 11 — DevOps/CI/CD | ✅ Concluído (essencial) | Nuvem provisionada e **deploy automático a partir do Git** funcionando: Render builda `backend/Dockerfile` e publica a cada push na `main` (`buscarm.onrender.com`); Vercel publica o frontend. CI (backend/frontend/e2e) obrigatória por PR; `smoke.yml` para verificação pós-deploy. Pendências menores: token do Vercel com escopo do time (para operar por CLI) e medir/formalizar |
 | 1 / 2 | ✅ Implementado na prática | Modelagem e backend base existem (checkboxes não marcados no plano) |
 | 8 — Acessibilidade | ⬜ Pendente | Bases feitas; falta auditoria axe-core/Lighthouse formal |
 | 10 — Testes (cobertura formal) | 🟡 Em andamento | Vários testes existem; falta meta de cobertura/relatório |
